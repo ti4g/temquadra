@@ -2,9 +2,10 @@
 let map;                 // mapa Leaflet
 let camadaMarcadores;    // grupo de pinos
 const marcadores = {};   // id da quadra -> marcador
+let detalheAberto = false; // painel de detalhe aberto?
 
-const CENTRO_PALMAS = [-10.2491, -48.3243];
-const ZOOM_INICIAL = 13;
+const CENTRO_PALMAS = [-10.2085, -48.3470];
+const ZOOM_INICIAL = 14;
 
 // ===== Identidade por tipo de piso (a "assinatura" visual) =====
 const PISO_META = {
@@ -161,10 +162,6 @@ function abrirDetalhe(id) {
       '</div>' +
     '</div>' +
     '<div class="detalhe__corpo">' +
-      '<a class="btn-direcao" href="' + linkMaps(q) + '" target="_blank" rel="noopener">' +
-        '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>' +
-        'Como chegar' +
-      '</a>' +
       '<div class="detalhe__fatos">' +
         '<div class="fato"><div class="fato__rot">Cobertura</div><div class="fato__val">' + (q.coberta ? 'Coberta' : 'Descoberta') + '</div></div>' +
         '<div class="fato"><div class="fato__rot">Conservação</div><div class="fato__val">' + q.conservacao + '</div></div>' +
@@ -174,16 +171,37 @@ function abrirDetalhe(id) {
       '<p class="detalhe__tit">Equipamentos</p>' +
       '<ul class="equips">' + equipsHTML + '</ul>' +
       (q.demo ? '<p class="detalhe__aviso">Quadra de exemplo — dados e foto a substituir pelos reais.</p>' : '') +
+    '</div>' +
+    '<div class="detalhe__rodape">' +
+      '<a class="btn-direcao" href="' + linkMaps(q) + '" target="_blank" rel="noopener">' +
+        '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>' +
+        'Como chegar' +
+      '</a>' +
     '</div>';
   el.classList.add('aberto');
-  document.getElementById('detalhe-fechar').addEventListener('click', fecharDetalhe);
+  document.getElementById('detalhe-fechar').addEventListener('click', pedirFechar);
   if (map) map.panTo([q.coordenadas.lat, q.coordenadas.lng]);
   const m = marcadores[id];
   if (m) m.openPopup();
+  if (!detalheAberto) {
+    detalheAberto = true;
+    history.pushState({ detalhe: true }, '');
+  }
 }
 
+// Fecha o painel visualmente
 function fecharDetalhe() {
   document.getElementById('detalhe').classList.remove('aberto');
+  detalheAberto = false;
+}
+
+// Pedido de fechar (× ou Esc): usa o histórico, pra o botão "voltar" também fechar
+function pedirFechar() {
+  if (detalheAberto && history.state && history.state.detalhe) {
+    history.back();
+  } else {
+    fecharDetalhe();
+  }
 }
 
 // ===== Filtros =====
@@ -239,7 +257,11 @@ function iniciar() {
     b.addEventListener('click', function () { alternarVista(b.dataset.vista); });
   });
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') fecharDetalhe();
+    if (e.key === 'Escape') pedirFechar();
+  });
+  // Botão "voltar" (navegador/celular) fecha o detalhe em vez de sair do site
+  window.addEventListener('popstate', function () {
+    if (detalheAberto) fecharDetalhe();
   });
   alternarVista('lista');
 }
