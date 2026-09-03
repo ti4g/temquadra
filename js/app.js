@@ -86,6 +86,12 @@ function destacar(id, on) {
 function temFoto(q) { return q.fotos && q.fotos.length; }
 function fotoDe(q) { return temFoto(q) ? q.fotos[0] : 'imgs/placeholder.svg'; }
 
+// Link do Google Maps: usa o link cadastrado; senão, gera rota pelas coordenadas.
+function linkMaps(q) {
+  if (q.maps) return q.maps;
+  return 'https://www.google.com/maps/dir/?api=1&destination=' + q.coordenadas.lat + ',' + q.coordenadas.lng;
+}
+
 // ===== Lista de cards =====
 function renderCards(lista) {
   const alvo = document.getElementById('lista');
@@ -147,7 +153,7 @@ function abrirDetalhe(id) {
     '<button class="detalhe__fechar" id="detalhe-fechar" aria-label="Fechar">&times;</button>' +
     '<div class="' + heroClasse + '" style="--cor:' + cor + '">' +
       '<img src="' + fotoDe(q) + '" alt="Foto da ' + q.nome + '">' +
-      LINHAS_QUADRA +
+      (temFoto(q) ? '' : LINHAS_QUADRA) +
       '<div class="detalhe__heroInfo">' +
         '<span class="detalhe__pisoTag" style="--cor:' + cor + '">' + pisoLabel(q.piso) + '</span>' +
         '<h2>' + q.nome + '</h2>' +
@@ -155,6 +161,10 @@ function abrirDetalhe(id) {
       '</div>' +
     '</div>' +
     '<div class="detalhe__corpo">' +
+      '<a class="btn-direcao" href="' + linkMaps(q) + '" target="_blank" rel="noopener">' +
+        '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>' +
+        'Como chegar' +
+      '</a>' +
       '<div class="detalhe__fatos">' +
         '<div class="fato"><div class="fato__rot">Cobertura</div><div class="fato__val">' + (q.coberta ? 'Coberta' : 'Descoberta') + '</div></div>' +
         '<div class="fato"><div class="fato__rot">Conservação</div><div class="fato__val">' + q.conservacao + '</div></div>' +

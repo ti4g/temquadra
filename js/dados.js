@@ -13,6 +13,7 @@ const QUADRAS = [
     coberta: false,
     conservacao: "boa",
     fotos: ["imgs/praca-303-sul.jpg"],
+    maps: "https://maps.app.goo.gl/qMDSttLb7mqZ8qfG6",
     demo: false
   },
   {
@@ -26,6 +27,7 @@ const QUADRAS = [
     coberta: false,
     conservacao: "boa",
     fotos: ["imgs/praca-507-sul.jpeg"],
+    maps: "https://maps.app.goo.gl/G1Dc27cubbPKhJBu7",
     demo: false
   },
   {

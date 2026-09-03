@@ -12,6 +12,14 @@
 </head>
 <body>
   <header class="topbar">
+    <svg class="topbar__court" viewBox="0 0 300 100" aria-hidden="true">
+      <g fill="none" stroke="currentColor" stroke-width="2.5">
+        <rect x="4" y="4" width="292" height="92" rx="6"/>
+        <line x1="150" y1="4" x2="150" y2="96"/>
+        <circle cx="150" cy="50" r="17"/>
+        <path d="M4 30h40v40H4M296 30h-40v40h40"/>
+      </g>
+    </svg>
     <div class="topbar__brand">
       <span class="logo" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
@@ -25,7 +33,7 @@
       </div>
     </div>
     <a class="btn-sugerir" id="btn-sugerir"
-       href="https://forms.gle/SEU-FORMULARIO-AQUI"
+       href="https://forms.gle/HegaB8Drrgqfn41r5"
        target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
       Sugerir quadra
@@ -35,10 +43,10 @@
   <nav class="filtros" id="filtros" aria-label="Filtros">
     <div class="filtros__grupo">
       <span class="filtros__rotulo">Piso</span>
-      <label class="chip"><input type="checkbox" data-grupo="piso" data-valor="areia"><span>Areia</span></label>
-      <label class="chip"><input type="checkbox" data-grupo="piso" data-valor="gramado"><span>Gramado</span></label>
-      <label class="chip"><input type="checkbox" data-grupo="piso" data-valor="cimento"><span>Cimento</span></label>
-      <label class="chip"><input type="checkbox" data-grupo="piso" data-valor="emborrachado"><span>Emborrachado</span></label>
+      <label class="chip"><span class="chip__dot" style="--c:#E0A94E"></span><input type="checkbox" data-grupo="piso" data-valor="areia"><span>Areia</span></label>
+      <label class="chip"><span class="chip__dot" style="--c:#37A96A"></span><input type="checkbox" data-grupo="piso" data-valor="gramado"><span>Gramado</span></label>
+      <label class="chip"><span class="chip__dot" style="--c:#17B0BD"></span><input type="checkbox" data-grupo="piso" data-valor="cimento"><span>Cimento</span></label>
+      <label class="chip"><span class="chip__dot" style="--c:#FF6A4D"></span><input type="checkbox" data-grupo="piso" data-valor="emborrachado"><span>Emborrachado</span></label>
     </div>
     <div class="filtros__grupo">
       <span class="filtros__rotulo">Modalidade</span>
