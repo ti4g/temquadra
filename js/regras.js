@@ -69,6 +69,13 @@
     return item ? item.label : valor;
   }
 
+  // Todo texto vindo de fora (sugestões, doações) passa por aqui antes de ir pro HTML
+  function escaparHtml(v) {
+    return String(v == null ? '' : v)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
   function texto(v) { return String(v == null ? '' : v).trim(); }
   function lista(v) { return Array.isArray(v) ? v : []; }
 
@@ -138,7 +145,7 @@
 
   function gerarIdQuadra(nome, idsExistentes) {
     const base = String(nome || '')
-      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'quadra';
     const usados = new Set(lista(idsExistentes));
     if (!usados.has(base)) return base;
@@ -280,6 +287,7 @@
     COBERTURAS: COBERTURAS, CONSERVACOES: CONSERVACOES, MATERIAIS: MATERIAIS,
     ESTADOS_DOACAO: ESTADOS_DOACAO, ENTREGAS: ENTREGAS, STATUS_DOACAO: STATUS_DOACAO,
     rotulo: rotulo,
+    escaparHtml: escaparHtml,
     normalizarQuadra: normalizarQuadra,
     quadraTemValor: quadraTemValor,
     filtrarQuadras: filtrarQuadras,

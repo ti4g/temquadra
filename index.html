@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quadras de Palmas</title>
+  <meta name="description" content="Mapa das quadras esportivas de Palmas (TO): tipo de piso, equipamentos, bebedouro, banheiro e doação de materiais esportivos.">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,63 +33,52 @@
         <p class="brand__tag">Onde jogar em Palmas · TO</p>
       </div>
     </div>
-    <a class="btn-sugerir" id="btn-sugerir"
-       href="https://forms.gle/HegaB8Drrgqfn41r5"
-       target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-      Sugerir quadra
-    </a>
+    <div class="topbar__acoes">
+      <button type="button" class="btn-topo btn-topo--sec" id="btn-doar" aria-label="Doar materiais">
+        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 21.5l8.8-8.8a5 5 0 0 0 0-7.1z"/></svg>
+        <span>Doar materiais</span>
+      </button>
+      <button type="button" class="btn-topo" id="btn-sugerir" aria-label="Sugerir quadra">
+        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        <span>Sugerir quadra</span>
+      </button>
+    </div>
   </header>
 
-  <nav class="filtros" id="filtros" aria-label="Filtros">
-    <div class="filtros__grupo">
-      <span class="filtros__rotulo">Piso</span>
-      <label class="chip"><span class="chip__dot" style="--c:#E0A94E"></span><input type="checkbox" data-grupo="piso" data-valor="areia"><span>Areia</span></label>
-      <label class="chip"><span class="chip__dot" style="--c:#37A96A"></span><input type="checkbox" data-grupo="piso" data-valor="gramado"><span>Gramado</span></label>
-      <label class="chip"><span class="chip__dot" style="--c:#17B0BD"></span><input type="checkbox" data-grupo="piso" data-valor="cimento"><span>Cimento</span></label>
-      <label class="chip"><span class="chip__dot" style="--c:#FF6A4D"></span><input type="checkbox" data-grupo="piso" data-valor="emborrachado"><span>Emborrachado</span></label>
-    </div>
-    <div class="filtros__grupo">
-      <span class="filtros__rotulo">Modalidade</span>
-      <label class="chip"><input type="checkbox" data-grupo="modalidade" data-valor="volei"><span>Vôlei</span></label>
-      <label class="chip"><input type="checkbox" data-grupo="modalidade" data-valor="basquete"><span>Basquete</span></label>
-      <label class="chip"><input type="checkbox" data-grupo="modalidade" data-valor="futsal"><span>Futsal</span></label>
-      <label class="chip"><input type="checkbox" data-grupo="modalidade" data-valor="society"><span>Society</span></label>
-    </div>
-    <div class="filtros__grupo">
-      <span class="filtros__rotulo">Equipamentos</span>
-      <label class="chip"><input type="checkbox" data-grupo="equipamento" data-valor="redeVolei"><span>Rede de vôlei</span></label>
-      <label class="chip"><input type="checkbox" data-grupo="equipamento" data-valor="aroBasquete"><span>Aro de basquete</span></label>
-      <label class="chip"><input type="checkbox" data-grupo="equipamento" data-valor="traves"><span>Traves</span></label>
-      <label class="chip"><input type="checkbox" data-grupo="equipamento" data-valor="iluminacao"><span>Iluminação</span></label>
-    </div>
-    <div class="filtros__grupo">
-      <span class="filtros__rotulo">Cobertura</span>
-      <label class="chip"><input type="checkbox" data-grupo="cobertura" data-valor="coberta"><span>Coberta</span></label>
-      <label class="chip"><input type="checkbox" data-grupo="cobertura" data-valor="descoberta"><span>Descoberta</span></label>
-    </div>
-  </nav>
+  <!-- Tela: mapa + lista -->
+  <div class="tela-mapa" id="tela-mapa">
+    <nav class="filtros" id="filtros" aria-label="Filtros"></nav>
 
-  <main class="app" id="app">
-    <div class="alternador">
-      <button class="alternador__btn ativo" data-vista="lista">Lista</button>
-      <button class="alternador__btn" data-vista="mapa">Mapa</button>
-    </div>
+    <main class="app" id="app">
+      <div class="alternador">
+        <button type="button" class="alternador__btn ativo" data-vista="lista">Lista</button>
+        <button type="button" class="alternador__btn" data-vista="mapa">Mapa</button>
+      </div>
 
-    <section class="app__lista">
-      <p id="contador"></p>
-      <div id="lista"></div>
-    </section>
+      <section class="app__lista" aria-label="Lista de quadras">
+        <p id="contador" aria-live="polite"></p>
+        <div id="lista"></div>
+      </section>
 
-    <section class="app__mapa">
-      <div id="mapa"></div>
-    </section>
-  </main>
+      <section class="app__mapa" aria-label="Mapa">
+        <div id="mapa"></div>
+      </section>
+    </main>
+  </div>
 
-  <aside class="detalhe" id="detalhe" aria-live="polite"></aside>
+  <!-- Tela: doar materiais (preenchida por js/doar.js) -->
+  <section class="tela-doar" id="tela-doar" hidden aria-label="Doar materiais"></section>
+
+  <!-- Painéis laterais -->
+  <aside class="painel detalhe" id="detalhe" aria-label="Detalhes da quadra"></aside>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/dados.js"></script>
+  <script src="js/regras.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/icones.js"></script>
+  <script src="js/navegacao.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

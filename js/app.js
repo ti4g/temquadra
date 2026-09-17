@@ -1,268 +1,321 @@
-// ===== Estado global =====
-let map;                 // mapa Leaflet
-let camadaMarcadores;    // grupo de pinos
-const marcadores = {};   // id da quadra -> marcador
-let detalheAberto = false; // painel de detalhe aberto?
+/* Quadras de Palmas — mapa, lista, filtros e detalhe da quadra.
+   Dados sempre via Api (js/api.js); regras via Regras (js/regras.js). */
+(function (raiz) {
+  'use strict';
 
-const CENTRO_PALMAS = [-10.2085, -48.3470];
-const ZOOM_INICIAL = 14;
+  const esc = Regras.escaparHtml;
 
-// ===== Identidade por tipo de piso (a "assinatura" visual) =====
-const PISO_META = {
-  areia:        { label: 'Areia',        cor: '#E0A94E' },
-  gramado:      { label: 'Gramado',      cor: '#37A96A' },
-  cimento:      { label: 'Cimento',      cor: '#17B0BD' },
-  emborrachado: { label: 'Emborrachado', cor: '#FF6A4D' }
-};
-function pisoLabel(p) { return (PISO_META[p] && PISO_META[p].label) || p; }
-function corDoPiso(q) { return (PISO_META[q.piso] && PISO_META[q.piso].cor) || '#17B0BD'; }
+  // ===== Estado =====
+  let map;
+  let camadaMarcadores;
+  const marcadores = {};        // id da quadra -> marcador
+  let quadras = [];
+  let carregou = false;
+  const ouvintesCarregar = [];
 
-const MOD_LABEL = { volei: 'Vôlei', basquete: 'Basquete', futsal: 'Futsal', society: 'Society' };
-function modLabel(m) { return MOD_LABEL[m] || m; }
+  const CENTRO_PALMAS = [-10.2085, -48.3470];
+  const ZOOM_INICIAL = 14;
 
-// ===== Ícones (SVG) dos equipamentos =====
-const ICONE = {
-  redeVolei: '<svg viewBox="0 0 24 24"><path d="M3 8h18v9H3z"/><path d="M3 12h18M3 15h18M8 8v9M13 8v9M18 8v9M3 5v3M21 5v3"/></svg>',
-  aroBasquete: '<svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="8" rx="1"/><path d="M9 11c0 1.7 1.3 3 3 3s3-1.3 3-3"/><path d="M10 13.5 9 21M14 13.5 15 21M12 14v7"/></svg>',
-  traves: '<svg viewBox="0 0 24 24"><path d="M3 20V7h18v13"/><path d="M3 7l3-3h12l3 3"/><path d="M7 20v-6h10v6"/></svg>',
-  iluminacao: '<svg viewBox="0 0 24 24"><circle cx="12" cy="11" r="4"/><path d="M12 2v2M12 18v2M3 11h2M19 11h2M5.6 4.6l1.4 1.4M17 17l1.4 1.4M18.4 4.6 17 6M7 17l-1.4 1.4"/></svg>'
-};
-const EQUIP = [
-  { chave: 'redeVolei',   label: 'Rede de vôlei' },
-  { chave: 'aroBasquete', label: 'Aro de basquete' },
-  { chave: 'traves',      label: 'Traves' },
-  { chave: 'iluminacao',  label: 'Iluminação' }
-];
-function equipsPresentes(q) { return EQUIP.filter(function (e) { return q.equipamentos[e.chave]; }); }
+  const GRUPOS_FILTRO = [
+    { grupo: 'piso', titulo: 'Piso', catalogo: Regras.PISOS, comCor: true },
+    { grupo: 'modalidade', titulo: 'Modalidade', catalogo: Regras.MODALIDADES },
+    { grupo: 'equipamento', titulo: 'Equipamentos', catalogo: Regras.EQUIPAMENTOS },
+    { grupo: 'estrutura', titulo: 'Estrutura', catalogo: Regras.ESTRUTURAS },
+    { grupo: 'cobertura', titulo: 'Cobertura', catalogo: Regras.COBERTURAS }
+  ];
 
-// Traços de quadra (marcações) usados como marca-d'água no detalhe
-const LINHAS_QUADRA =
-  '<svg class="detalhe__linhas" viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' +
-  '<g fill="none" stroke="#fff" stroke-width="2">' +
-  '<rect x="6" y="6" width="188" height="108" rx="2"/>' +
-  '<line x1="100" y1="6" x2="100" y2="114"/>' +
-  '<circle cx="100" cy="60" r="22"/>' +
-  '<rect x="6" y="38" width="34" height="44"/>' +
-  '<rect x="160" y="38" width="34" height="44"/></g></svg>';
+  function acharQuadra(id) { return quadras.find(function (q) { return q.id === id; }); }
+  function temFoto(q) { return q.fotos.length > 0; }
+  function fotoDe(q) { return temFoto(q) ? q.fotos[0] : 'imgs/placeholder.svg'; }
 
-// ===== Mapa =====
-function iniciarMapa() {
-  map = L.map('mapa', { zoomControl: true }).setView(CENTRO_PALMAS, ZOOM_INICIAL);
-  // Mapa claro (Esri Light Gray) — gratuito e sem chave; deixa os pinos saltarem.
-  const esriOpts = { maxZoom: 19, maxNativeZoom: 16, attribution: 'Tiles &copy; Esri &mdash; &copy; OpenStreetMap' };
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', esriOpts).addTo(map);
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}', esriOpts).addTo(map);
-  camadaMarcadores = L.layerGroup().addTo(map);
-}
-
-function criarIcone(cor, destaque) {
-  return L.divIcon({
-    className: 'pin' + (destaque ? ' pin--destaque' : ''),
-    html: '<span class="pin__ponto" style="--cor:' + cor + '"></span>',
-    iconSize: [24, 24],
-    iconAnchor: [12, 24],
-    popupAnchor: [0, -24]
-  });
-}
-
-function renderMarcadores(lista) {
-  camadaMarcadores.clearLayers();
-  for (const id in marcadores) delete marcadores[id];
-  lista.forEach(function (q) {
-    const m = L.marker([q.coordenadas.lat, q.coordenadas.lng], { icon: criarIcone(corDoPiso(q), false) });
-    m.bindPopup('<strong>' + q.nome + '</strong><br>' + q.regiao);
-    m.on('click', function () { abrirDetalhe(q.id); });
-    m.addTo(camadaMarcadores);
-    marcadores[q.id] = m;
-  });
-}
-
-function destacar(id, on) {
-  const m = marcadores[id];
-  const q = QUADRAS.find(function (x) { return x.id === id; });
-  if (m && q) m.setIcon(criarIcone(corDoPiso(q), on));
-}
-
-// ===== Utilidades de dados =====
-function temFoto(q) { return q.fotos && q.fotos.length; }
-function fotoDe(q) { return temFoto(q) ? q.fotos[0] : 'imgs/placeholder.svg'; }
-
-// Link do Google Maps: usa o link cadastrado; senão, gera rota pelas coordenadas.
-function linkMaps(q) {
-  if (q.maps) return q.maps;
-  return 'https://www.google.com/maps/dir/?api=1&destination=' + q.coordenadas.lat + ',' + q.coordenadas.lng;
-}
-
-// ===== Lista de cards =====
-function renderCards(lista) {
-  const alvo = document.getElementById('lista');
-  alvo.innerHTML = '';
-  if (!lista.length) {
-    alvo.innerHTML =
-      '<div class="vazio">' + LINHAS_QUADRA.replace('detalhe__linhas', 'vazio__linhas') +
-      '<p>Nenhuma quadra com esses filtros.<br>Tente afrouxar a busca.</p></div>';
-    return;
+  // Link do Google Maps: usa o cadastrado; senão, rota pelas coordenadas
+  function linkMaps(q) {
+    if (q.maps) return q.maps;
+    return 'https://www.google.com/maps/dir/?api=1&destination=' + q.coordenadas.lat + ',' + q.coordenadas.lng;
   }
-  lista.forEach(function (q) {
-    const equips = equipsPresentes(q);
-    const iconesHTML = equips.length
-      ? '<div class="card__equip">' + equips.map(function (e) {
-          return '<span class="ic" title="' + e.label + '">' + ICONE[e.chave] + '</span>';
-        }).join('') + '</div>'
-      : '<p class="card__semequip">Sem equipamentos cadastrados</p>';
 
-    const midiaClasse = 'card__midia' + (temFoto(q) ? '' : ' card__midia--vazia');
-
-    const card = document.createElement('article');
-    card.className = 'card';
-    card.dataset.id = q.id;
-    card.innerHTML =
-      '<div class="' + midiaClasse + '">' +
-        '<img class="card__foto" src="' + fotoDe(q) + '" alt="Foto da ' + q.nome + '">' +
-        (q.demo ? '<span class="card__demo">exemplo</span>' : '') +
-        '<span class="card__piso" style="--cor:' + corDoPiso(q) + '">' + pisoLabel(q.piso) +
-          (q.coberta ? ' · coberta' : '') + '</span>' +
-      '</div>' +
-      '<div class="card__corpo">' +
-        '<p class="card__regiao">' + q.regiao + '</p>' +
-        '<h3 class="card__nome">' + q.nome + '</h3>' +
-        iconesHTML +
-      '</div>';
-    card.addEventListener('click', function () { abrirDetalhe(q.id); });
-    card.addEventListener('mouseenter', function () { destacar(q.id, true); });
-    card.addEventListener('mouseleave', function () { destacar(q.id, false); });
-    alvo.appendChild(card);
-  });
-}
-
-// ===== Painel de detalhe =====
-function abrirDetalhe(id) {
-  const q = QUADRAS.find(function (x) { return x.id === id; });
-  if (!q) return;
-  const cor = corDoPiso(q);
-  const equips = equipsPresentes(q);
-
-  const heroClasse = 'detalhe__hero' + (temFoto(q) ? '' : ' detalhe__hero--vazia');
-  const equipsHTML = equips.length
-    ? equips.map(function (e) {
-        return '<li><span class="ic" style="color:' + cor + '">' + ICONE[e.chave] + '</span>' + e.label + '</li>';
-      }).join('')
-    : '<li>Nenhum equipamento cadastrado</li>';
-
-  const el = document.getElementById('detalhe');
-  el.innerHTML =
-    '<button class="detalhe__fechar" id="detalhe-fechar" aria-label="Fechar">&times;</button>' +
-    '<div class="' + heroClasse + '" style="--cor:' + cor + '">' +
-      '<img src="' + fotoDe(q) + '" alt="Foto da ' + q.nome + '">' +
-      (temFoto(q) ? '' : LINHAS_QUADRA) +
-      '<div class="detalhe__heroInfo">' +
-        '<span class="detalhe__pisoTag" style="--cor:' + cor + '">' + pisoLabel(q.piso) + '</span>' +
-        '<h2>' + q.nome + '</h2>' +
-        '<p class="mono">' + q.regiao + '</p>' +
-      '</div>' +
-    '</div>' +
-    '<div class="detalhe__corpo">' +
-      '<div class="detalhe__fatos">' +
-        '<div class="fato"><div class="fato__rot">Cobertura</div><div class="fato__val">' + (q.coberta ? 'Coberta' : 'Descoberta') + '</div></div>' +
-        '<div class="fato"><div class="fato__rot">Conservação</div><div class="fato__val">' + q.conservacao + '</div></div>' +
-      '</div>' +
-      '<p class="detalhe__tit">Modalidades</p>' +
-      '<div class="mods">' + q.modalidades.map(function (m) { return '<span class="mod">' + modLabel(m) + '</span>'; }).join('') + '</div>' +
-      '<p class="detalhe__tit">Equipamentos</p>' +
-      '<ul class="equips">' + equipsHTML + '</ul>' +
-      (q.demo ? '<p class="detalhe__aviso">Quadra de exemplo — dados e foto a substituir pelos reais.</p>' : '') +
-    '</div>' +
-    '<div class="detalhe__rodape">' +
-      '<a class="btn-direcao" href="' + linkMaps(q) + '" target="_blank" rel="noopener">' +
-        '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>' +
-        'Como chegar' +
-      '</a>' +
-    '</div>';
-  el.classList.add('aberto');
-  document.getElementById('detalhe-fechar').addEventListener('click', pedirFechar);
-  if (map) map.panTo([q.coordenadas.lat, q.coordenadas.lng]);
-  const m = marcadores[id];
-  if (m) m.openPopup();
-  if (!detalheAberto) {
-    detalheAberto = true;
-    history.pushState({ detalhe: true }, '');
+  // ===== Mapa =====
+  function iniciarMapa() {
+    map = L.map('mapa', { zoomControl: true }).setView(CENTRO_PALMAS, ZOOM_INICIAL);
+    // Mapa claro (Esri Light Gray) — gratuito e sem chave; deixa os pinos saltarem
+    const esriOpts = { maxZoom: 19, maxNativeZoom: 16, attribution: 'Tiles &copy; Esri &mdash; &copy; OpenStreetMap' };
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', esriOpts).addTo(map);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}', esriOpts).addTo(map);
+    camadaMarcadores = L.layerGroup().addTo(map);
   }
-}
 
-// Fecha o painel visualmente
-function fecharDetalhe() {
-  document.getElementById('detalhe').classList.remove('aberto');
-  detalheAberto = false;
-}
-
-// Pedido de fechar (× ou Esc): usa o histórico, pra o botão "voltar" também fechar
-function pedirFechar() {
-  if (detalheAberto && history.state && history.state.detalhe) {
-    history.back();
-  } else {
-    fecharDetalhe();
-  }
-}
-
-// ===== Filtros =====
-function lerFiltros() {
-  const grupos = {};
-  document.querySelectorAll('.filtros input[type="checkbox"]:checked').forEach(function (cb) {
-    const g = cb.dataset.grupo, v = cb.dataset.valor;
-    (grupos[g] = grupos[g] || []).push(v);
-  });
-  return grupos;
-}
-
-function quadraTemValor(q, grupo, valor) {
-  if (grupo === 'piso') return q.piso === valor;
-  if (grupo === 'modalidade') return q.modalidades.includes(valor);
-  if (grupo === 'equipamento') return q.equipamentos[valor] === true;
-  if (grupo === 'cobertura') return valor === 'coberta' ? q.coberta : !q.coberta;
-  return false;
-}
-
-function aplicarFiltros() {
-  const grupos = lerFiltros();
-  const lista = QUADRAS.filter(function (q) {
-    return Object.keys(grupos).every(function (g) {
-      return grupos[g].some(function (v) { return quadraTemValor(q, g, v); });
+  function criarIcone(cor, destaque) {
+    return L.divIcon({
+      className: 'pin' + (destaque ? ' pin--destaque' : ''),
+      html: '<span class="pin__ponto" style="--cor:' + cor + '"></span>',
+      iconSize: [24, 24],
+      iconAnchor: [12, 24],
+      popupAnchor: [0, -24]
     });
-  });
-  renderCards(lista);
-  renderMarcadores(lista);
-  document.getElementById('contador').textContent =
-    lista.length + (lista.length === 1 ? ' quadra' : ' quadras');
-}
+  }
 
-// ===== Responsivo =====
-function alternarVista(vista) {
-  const app = document.getElementById('app');
-  app.classList.toggle('mostrar-mapa', vista === 'mapa');
-  app.classList.toggle('mostrar-lista', vista === 'lista');
-  document.querySelectorAll('.alternador__btn').forEach(function (b) {
-    b.classList.toggle('ativo', b.dataset.vista === vista);
-  });
-  if (vista === 'mapa' && map) setTimeout(function () { map.invalidateSize(); }, 0);
-}
+  function renderMarcadores(lista) {
+    camadaMarcadores.clearLayers();
+    Object.keys(marcadores).forEach(function (id) { delete marcadores[id]; });
+    lista.forEach(function (q) {
+      const m = L.marker([q.coordenadas.lat, q.coordenadas.lng], {
+        icon: criarIcone(Icones.corDoPiso(q.piso), false),
+        title: q.nome,
+        alt: q.nome
+      });
+      m.bindPopup('<strong>' + esc(q.nome) + '</strong>' + (q.regiao ? '<br>' + esc(q.regiao) : ''));
+      m.on('click', function () { abrirDetalhe(q.id); });
+      m.addTo(camadaMarcadores);
+      marcadores[q.id] = m;
+    });
+  }
 
-// ===== Início =====
-function iniciar() {
-  iniciarMapa();
-  aplicarFiltros();
-  document.querySelectorAll('.filtros input[type="checkbox"]').forEach(function (cb) {
-    cb.addEventListener('change', aplicarFiltros);
-  });
-  document.querySelectorAll('.alternador__btn').forEach(function (b) {
-    b.addEventListener('click', function () { alternarVista(b.dataset.vista); });
-  });
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') pedirFechar();
-  });
-  // Botão "voltar" (navegador/celular) fecha o detalhe em vez de sair do site
-  window.addEventListener('popstate', function () {
-    if (detalheAberto) fecharDetalhe();
-  });
-  alternarVista('lista');
-}
-document.addEventListener('DOMContentLoaded', iniciar);
+  function destacar(id, ligado) {
+    const m = marcadores[id];
+    const q = acharQuadra(id);
+    if (m && q) m.setIcon(criarIcone(Icones.corDoPiso(q.piso), ligado));
+  }
+
+  // ===== Filtros =====
+  function renderFiltros() {
+    document.getElementById('filtros').innerHTML = GRUPOS_FILTRO.map(function (g) {
+      return '<div class="filtros__grupo" role="group" aria-label="' + g.titulo + '">' +
+        '<span class="filtros__rotulo" aria-hidden="true">' + g.titulo + '</span>' +
+        g.catalogo.map(function (item) {
+          return '<label class="chip">' +
+            (g.comCor ? '<span class="chip__dot" style="--c:' + Icones.corDoPiso(item.valor) + '"></span>' : '') +
+            '<input type="checkbox" data-grupo="' + g.grupo + '" data-valor="' + item.valor + '">' +
+            '<span>' + item.label + '</span></label>';
+        }).join('') +
+        '</div>';
+    }).join('');
+  }
+
+  function lerFiltros() {
+    const grupos = {};
+    document.querySelectorAll('#filtros input[type="checkbox"]:checked').forEach(function (cb) {
+      (grupos[cb.dataset.grupo] = grupos[cb.dataset.grupo] || []).push(cb.dataset.valor);
+    });
+    return grupos;
+  }
+
+  function aplicarFiltros() {
+    if (!carregou) return;
+    const lista = Regras.filtrarQuadras(quadras, lerFiltros());
+    renderCards(lista);
+    renderMarcadores(lista);
+    document.getElementById('contador').textContent =
+      lista.length + (lista.length === 1 ? ' quadra' : ' quadras');
+  }
+
+  // ===== Lista de cards =====
+  function htmlIconesCard(q) {
+    const eq = Regras.EQUIPAMENTOS.filter(function (e) { return q.equipamentos[e.valor]; });
+    const es = Regras.ESTRUTURAS.filter(function (e) { return q.estrutura[e.valor]; });
+    if (!eq.length && !es.length) return '<p class="card__semequip">Sem equipamentos cadastrados</p>';
+    function icone(e, extra) {
+      return '<span class="ic' + (extra || '') + '" role="img" title="' + e.label + '" aria-label="' + e.label + '">' +
+        Icones.svg(e.valor) + '</span>';
+    }
+    return '<div class="card__equip">' +
+      eq.map(function (e) { return icone(e); }).join('') +
+      (eq.length && es.length ? '<span class="card__div" aria-hidden="true"></span>' : '') +
+      es.map(function (e) { return icone(e, ' ic--estrutura'); }).join('') +
+      '</div>';
+  }
+
+  function renderCards(lista) {
+    const alvo = document.getElementById('lista');
+    alvo.innerHTML = '';
+    if (!lista.length) {
+      alvo.innerHTML =
+        '<div class="vazio">' + Icones.LINHAS_QUADRA.replace('detalhe__linhas', 'vazio__linhas') +
+        '<p>Nenhuma quadra com esses filtros.<br>Tente afrouxar a busca.</p></div>';
+      return;
+    }
+    lista.forEach(function (q) {
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.dataset.id = q.id;
+      card.tabIndex = 0;
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-label', 'Ver detalhes: ' + q.nome);
+      card.innerHTML =
+        '<div class="card__midia' + (temFoto(q) ? '' : ' card__midia--vazia') + '">' +
+          '<img class="card__foto" src="' + esc(fotoDe(q)) + '" alt="" loading="lazy">' +
+          (q.demo ? '<span class="card__demo">exemplo</span>' : '') +
+          (q.precisa.length ? '<span class="card__precisa">' + Icones.i('doar') + 'Precisa de doação</span>' : '') +
+          '<span class="card__piso" style="--cor:' + Icones.corDoPiso(q.piso) + '">' +
+            Regras.rotulo(Regras.PISOS, q.piso) + (q.coberta ? ' · coberta' : '') + '</span>' +
+        '</div>' +
+        '<div class="card__corpo">' +
+          (q.regiao ? '<p class="card__regiao">' + esc(q.regiao) + '</p>' : '') +
+          '<h3 class="card__nome">' + esc(q.nome) + '</h3>' +
+          htmlIconesCard(q) +
+        '</div>';
+      card.addEventListener('click', function () { abrirDetalhe(q.id); });
+      card.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); abrirDetalhe(q.id); }
+      });
+      card.addEventListener('mouseenter', function () { destacar(q.id, true); });
+      card.addEventListener('mouseleave', function () { destacar(q.id, false); });
+      alvo.appendChild(card);
+    });
+  }
+
+  function mostrarCarregando() {
+    document.getElementById('contador').textContent = '';
+    document.getElementById('lista').innerHTML =
+      '<p class="estado-lista" role="status">Carregando quadras…</p>';
+  }
+
+  function mostrarErroCarregar() {
+    document.getElementById('contador').textContent = '';
+    document.getElementById('lista').innerHTML =
+      '<div class="estado-lista estado-lista--erro" role="alert">' +
+        '<p>Não foi possível carregar as quadras.</p>' +
+        '<button type="button" class="btn-sec" id="tentar-carregar">Tentar de novo</button>' +
+      '</div>';
+    document.getElementById('tentar-carregar').addEventListener('click', carregarQuadras);
+  }
+
+  function carregarQuadras() {
+    mostrarCarregando();
+    Api.listarQuadras().then(function (lista) {
+      quadras = lista;
+      carregou = true;
+      aplicarFiltros();
+      ouvintesCarregar.forEach(function (fn) { fn(quadras); });
+    }).catch(mostrarErroCarregar);
+  }
+
+  // ===== Detalhe =====
+  function abrirDetalhe(id) {
+    const q = acharQuadra(id);
+    if (!q) return;
+    const cor = Icones.corDoPiso(q.piso);
+
+    const eq = Regras.EQUIPAMENTOS.filter(function (e) { return q.equipamentos[e.valor]; });
+    const equipsHTML = eq.length
+      ? eq.map(function (e) {
+          return '<li><span class="ic" style="color:' + cor + '">' + Icones.svg(e.valor) + '</span>' + e.label + '</li>';
+        }).join('')
+      : '<li>Nenhum equipamento cadastrado</li>';
+
+    const avisoRede = q.equipamentos.postesVolei && !q.equipamentos.redeVolei
+      ? '<p class="aviso aviso--info">' + Icones.i('info') + '<span>Tem postes de vôlei — leve sua rede.</span></p>'
+      : '';
+
+    const estruturaHTML = Regras.ESTRUTURAS.map(function (e) {
+      const tem = q.estrutura[e.valor];
+      return '<li class="' + (tem ? '' : 'equips__nao') + '">' +
+        '<span class="ic ic--estrutura">' + Icones.svg(e.valor) + '</span>' + e.label +
+        '<span class="status status--' + (tem ? 'sim' : 'nao') + '">' + (tem ? 'Tem' : 'Não tem') + '</span></li>';
+    }).join('');
+
+    const precisaHTML = q.precisa.length
+      ? '<div class="precisa">' +
+          '<p class="detalhe__tit">Precisa de doação</p>' +
+          '<ul class="precisa__itens">' + q.precisa.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>' +
+          '<button type="button" class="btn-doar-quadra" id="detalhe-doar">' + Icones.i('doar') + 'Quero doar</button>' +
+        '</div>'
+      : '';
+
+    const el = document.getElementById('detalhe');
+    el.innerHTML =
+      '<button type="button" class="detalhe__fechar" id="detalhe-fechar" aria-label="Fechar" data-foco-inicial>' + Icones.i('x') + '</button>' +
+      '<div class="detalhe__hero' + (temFoto(q) ? '' : ' detalhe__hero--vazia') + '" style="--cor:' + cor + '">' +
+        '<img src="' + esc(fotoDe(q)) + '" alt="Foto da ' + esc(q.nome) + '">' +
+        (temFoto(q) ? '' : Icones.LINHAS_QUADRA) +
+        '<div class="detalhe__heroInfo">' +
+          '<span class="detalhe__pisoTag" style="--cor:' + cor + '">' + Regras.rotulo(Regras.PISOS, q.piso) + '</span>' +
+          '<h2 id="detalhe-titulo">' + esc(q.nome) + '</h2>' +
+          (q.regiao ? '<p class="mono">' + esc(q.regiao) + '</p>' : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="detalhe__corpo">' +
+        '<div class="detalhe__fatos">' +
+          '<div class="fato"><div class="fato__rot">Cobertura</div><div class="fato__val">' + (q.coberta ? 'Coberta' : 'Descoberta') + '</div></div>' +
+          '<div class="fato"><div class="fato__rot">Conservação</div><div class="fato__val">' + (Regras.rotulo(Regras.CONSERVACOES, q.conservacao) || '—') + '</div></div>' +
+        '</div>' +
+        '<p class="detalhe__tit">Modalidades</p>' +
+        '<div class="mods">' + q.modalidades.map(function (m) { return '<span class="mod">' + esc(Regras.rotulo(Regras.MODALIDADES, m)) + '</span>'; }).join('') + '</div>' +
+        '<p class="detalhe__tit">Equipamentos</p>' +
+        '<ul class="equips">' + equipsHTML + '</ul>' +
+        avisoRede +
+        '<p class="detalhe__tit">Estrutura</p>' +
+        '<ul class="equips">' + estruturaHTML + '</ul>' +
+        precisaHTML +
+        (q.demo ? '<p class="detalhe__aviso">Quadra de exemplo — dados e foto a substituir pelos reais.</p>' : '') +
+        '<button type="button" class="link-corrigir" id="detalhe-corrigir">Algo errado? Sugerir correção</button>' +
+      '</div>' +
+      '<div class="detalhe__rodape">' +
+        '<a class="btn-direcao" href="' + esc(linkMaps(q)) + '" target="_blank" rel="noopener">' +
+          Icones.i('direcao') + 'Como chegar' +
+        '</a>' +
+      '</div>';
+    el.setAttribute('aria-labelledby', 'detalhe-titulo');
+
+    document.getElementById('detalhe-fechar').addEventListener('click', Nav.pedirFechar);
+    const btnDoar = document.getElementById('detalhe-doar');
+    if (btnDoar) btnDoar.addEventListener('click', function () {
+      if (raiz.Doar) raiz.Doar.abrirComQuadra(q.id);
+    });
+    document.getElementById('detalhe-corrigir').addEventListener('click', function () {
+      if (raiz.Sugerir) raiz.Sugerir.abrir({ tipo: 'correcao', quadraId: q.id });
+    });
+
+    Nav.abrirPainel('detalhe');
+    if (map) map.panTo([q.coordenadas.lat, q.coordenadas.lng]);
+    if (marcadores[id]) marcadores[id].openPopup();
+  }
+
+  // ===== Responsivo =====
+  function alternarVista(vista) {
+    const app = document.getElementById('app');
+    app.classList.toggle('mostrar-mapa', vista === 'mapa');
+    app.classList.toggle('mostrar-lista', vista === 'lista');
+    document.querySelectorAll('.alternador__btn').forEach(function (b) {
+      const ativo = b.dataset.vista === vista;
+      b.classList.toggle('ativo', ativo);
+      b.setAttribute('aria-pressed', ativo ? 'true' : 'false');
+    });
+    if (vista === 'mapa' && map) setTimeout(function () { map.invalidateSize(); }, 0);
+  }
+
+  // ===== Início =====
+  function iniciar() {
+    Nav.registrarPainel('detalhe', { el: document.getElementById('detalhe') });
+    Nav.aoMostrarTela = function (tela) {
+      if (tela === 'mapa' && map) setTimeout(function () { map.invalidateSize(); }, 0);
+      if (tela === 'doar' && raiz.Doar) raiz.Doar.aoMostrar();
+    };
+
+    iniciarMapa();
+    renderFiltros();
+    document.getElementById('filtros').addEventListener('change', aplicarFiltros);
+    document.querySelectorAll('.alternador__btn').forEach(function (b) {
+      b.addEventListener('click', function () { alternarVista(b.dataset.vista); });
+    });
+    document.getElementById('btn-doar').addEventListener('click', function () { Nav.irParaDoar(); });
+    document.getElementById('btn-sugerir').addEventListener('click', function () {
+      if (raiz.Sugerir) raiz.Sugerir.abrir({ tipo: 'nova' });
+    });
+
+    alternarVista('lista');
+    Nav.iniciar();
+    carregarQuadras();
+  }
+
+  raiz.App = {
+    abrirDetalhe: abrirDetalhe,
+    quadras: function () { return quadras; },
+    // Chama fn(quadras) quando carregar (ou já, se carregou)
+    aoCarregar: function (fn) {
+      ouvintesCarregar.push(fn);
+      if (carregou) fn(quadras);
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', iniciar);
+})(window);

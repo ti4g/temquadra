@@ -151,3 +151,10 @@ test('mensagemWhatsapp monta texto legível', () => {
   assert.match(c, /corrigir/);
   assert.match(c, /Praça 303 Sul/);
 });
+
+test('escaparHtml neutraliza HTML vindo de sugestões', () => {
+  assert.equal(R.escaparHtml('<img src=x onerror="alert(1)">'), '&lt;img src=x onerror=&quot;alert(1)&quot;&gt;');
+  assert.equal(R.escaparHtml("Praça D'Água & Cia"), 'Praça D&#39;Água &amp; Cia');
+  assert.equal(R.escaparHtml(null), '');
+  assert.equal(R.escaparHtml(404), '404');
+});
