@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Não aparece em buscadores. Isso NÃO é segurança: a proteção real é o login + as regras do Supabase. -->
+  <meta name="robots" content="noindex, nofollow">
+  <title>Painel da equipe — Quadras de Palmas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin">
+  <div class="admin-demo" id="a-demo" role="note" hidden>Modo demonstração — dados só neste navegador.</div>
+
+  <header class="topbar">
+    <div class="topbar__brand">
+      <span class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+          <path d="M12 2C8.1 2 5 5 5 8.9c0 4.7 5.6 10.3 6.3 11a1 1 0 0 0 1.4 0c.7-.7 6.3-6.3 6.3-11C19 5 15.9 2 12 2Z" fill="#fff"/>
+          <circle cx="12" cy="9" r="2.4" fill="#0E8A95"/>
+        </svg>
+      </span>
+      <div class="topbar__titulos">
+        <p class="brand__name">Quadras de Palmas</p>
+        <p class="brand__tag">Painel da equipe</p>
+      </div>
+    </div>
+    <div class="topbar__acoes">
+      <a class="btn-topo btn-topo--sec" href="index.html" aria-label="Ver o site">
+        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+        <span>Ver site</span>
+      </a>
+      <button type="button" class="btn-topo" id="a-sair" aria-label="Sair" hidden>
+        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5M5 12h11"/></svg>
+        <span>Sair</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <!-- Login -->
+    <section class="admin-login" id="a-login" hidden aria-labelledby="a-login-titulo">
+      <form class="form admin-login__cartao" id="form-login" novalidate>
+        <h1 class="admin-login__titulo" id="a-login-titulo">Entrar no painel</h1>
+        <p class="admin-login__sub">Só para a equipe do projeto.</p>
+        <div class="campo" data-campo="email">
+          <label class="campo__rotulo" for="a-email">E-mail</label>
+          <input class="entrada" id="a-email" type="email" autocomplete="username">
+          <p class="campo__erro" hidden></p>
+        </div>
+        <div class="campo" data-campo="senha">
+          <label class="campo__rotulo" for="a-senha">Senha</label>
+          <input class="entrada" id="a-senha" type="password" autocomplete="current-password">
+          <p class="campo__erro" hidden></p>
+        </div>
+        <p class="admin-erro" id="a-login-erro" role="alert" hidden></p>
+        <button type="submit" class="btn-primario" id="a-entrar">Entrar</button>
+        <p class="campo__ajuda admin-login__dica" id="a-dica-demo" hidden>
+          Demonstração: qualquer e-mail com a senha <strong>demo</strong>.
+        </p>
+      </form>
+    </section>
+
+    <!-- Painel -->
+    <section id="a-painel" hidden aria-labelledby="a-titulo">
+      <div class="admin-cabecalho">
+        <div>
+          <h1 class="admin-titulo" id="a-titulo">Painel da equipe</h1>
+          <p class="admin-usuario" id="a-usuario"></p>
+        </div>
+      </div>
+
+      <div class="admin-abas" role="tablist" aria-label="Seções do painel">
+        <button type="button" class="admin-aba" role="tab" id="a-tab-sugestoes" aria-controls="a-aba-sugestoes" aria-selected="true">
+          Sugestões <span class="admin-aba__num" id="a-num-pendentes" aria-label="pendentes"></span>
+        </button>
+        <button type="button" class="admin-aba" role="tab" id="a-tab-doacoes" aria-controls="a-aba-doacoes" aria-selected="false" tabindex="-1">
+          Doações <span class="admin-aba__num" id="a-num-novas" aria-label="novas"></span>
+        </button>
+      </div>
+
+      <p class="admin-aviso" id="a-aviso" role="alert" hidden></p>
+
+      <div role="tabpanel" id="a-aba-sugestoes" aria-labelledby="a-tab-sugestoes">
+        <div class="chips admin-filtro" id="a-filtro-status" role="radiogroup" aria-label="Filtrar sugestões"></div>
+        <div class="admin-lista" id="a-lista-sugestoes" aria-live="polite"></div>
+      </div>
+
+      <div role="tabpanel" id="a-aba-doacoes" aria-labelledby="a-tab-doacoes" hidden>
+        <div class="admin-lista" id="a-lista-doacoes" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/dados.js"></script>
+  <script src="js/regras.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/icones.js"></script>
+  <script src="js/formularios.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
