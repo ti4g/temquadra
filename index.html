@@ -72,6 +72,153 @@
   <!-- Painéis laterais -->
   <aside class="painel detalhe" id="detalhe" aria-label="Detalhes da quadra"></aside>
 
+  <aside class="painel painel-form" id="sugerir" aria-labelledby="sugerir-titulo">
+    <div class="painel__topo">
+      <div>
+        <p class="painel__eyebrow">Colabore com o mapa</p>
+        <h2 class="painel__titulo" id="sugerir-titulo">Sugerir quadra</h2>
+      </div>
+      <button type="button" class="painel__fechar" data-fechar aria-label="Fechar" data-foco-inicial>
+        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="painel__corpo">
+      <div class="fluxo" id="sugerir-fluxo">
+        <form class="form" id="form-sugerir" novalidate>
+          <fieldset class="campo" data-campo="tipo">
+            <legend class="campo__rotulo">O que você quer fazer?</legend>
+            <div class="chips chips--bloco" data-chips="tipo"></div>
+            <p class="campo__erro" hidden></p>
+          </fieldset>
+
+          <!-- Quadra nova -->
+          <div class="grupo-tipo" data-tipo="nova" hidden>
+            <div class="campo" data-campo="nome">
+              <label class="campo__rotulo" for="s-nome">Nome ou referência <span class="obrig" aria-hidden="true">*</span></label>
+              <input class="entrada" id="s-nome" name="nome" type="text" maxlength="120" autocomplete="off" placeholder="Ex.: Praça da 404 Sul" required>
+              <p class="campo__erro" hidden></p>
+            </div>
+
+            <div class="campo" data-campo="localizacao">
+              <span class="campo__rotulo">Onde fica <span class="obrig" aria-hidden="true">*</span></span>
+              <button type="button" class="btn-gps" id="s-gps">
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3"/></svg>
+                <span>Estou na quadra — usar minha localização</span>
+              </button>
+              <p class="local-status" id="s-local-status" role="status" hidden></p>
+              <div class="ou" aria-hidden="true"><span>ou</span></div>
+              <label class="campo__rotulo campo__rotulo--sub" for="s-referencia">Link do Google Maps ou ponto de referência</label>
+              <input class="entrada" id="s-referencia" name="referencia" type="text" maxlength="300" autocomplete="off" placeholder="Cole o link, a coordenada ou descreva o lugar">
+              <p class="campo__ajuda">Dica: no Google Maps, clique com o botão direito no lugar (no celular, toque e segure) e copie os números.</p>
+              <p class="campo__erro" hidden></p>
+            </div>
+
+            <fieldset class="campo" data-campo="piso">
+              <legend class="campo__rotulo">Piso <span class="obrig" aria-hidden="true">*</span></legend>
+              <div class="chips" data-chips="piso"></div>
+              <p class="campo__erro" hidden></p>
+            </fieldset>
+
+            <fieldset class="campo" data-campo="modalidades">
+              <legend class="campo__rotulo">O que dá pra jogar <span class="obrig" aria-hidden="true">*</span></legend>
+              <div class="chips" data-chips="modalidades"></div>
+              <p class="campo__erro" hidden></p>
+            </fieldset>
+
+            <fieldset class="campo" data-campo="equipamentos">
+              <legend class="campo__rotulo">Equipamentos <span class="opcional">(marque o que tem)</span></legend>
+              <div class="chips" data-chips="equipamentos"></div>
+              <p class="campo__erro" hidden></p>
+            </fieldset>
+
+            <fieldset class="campo" data-campo="estrutura">
+              <legend class="campo__rotulo">Estrutura <span class="opcional">(marque o que tem)</span></legend>
+              <div class="chips" data-chips="estrutura"></div>
+              <p class="campo__erro" hidden></p>
+            </fieldset>
+
+            <div class="linha-2">
+              <fieldset class="campo" data-campo="coberta">
+                <legend class="campo__rotulo">Coberta?</legend>
+                <div class="chips" data-chips="coberta"></div>
+              </fieldset>
+              <fieldset class="campo" data-campo="conservacao">
+                <legend class="campo__rotulo">Conservação</legend>
+                <div class="chips" data-chips="conservacao"></div>
+              </fieldset>
+            </div>
+
+            <div class="campo" data-campo="foto">
+              <span class="campo__rotulo">Foto da quadra <span class="opcional">(opcional)</span></span>
+              <input class="foto-input" id="s-foto" type="file" accept="image/*">
+              <label class="foto-escolher" for="s-foto">
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>
+                <span>Escolher ou tirar foto</span>
+              </label>
+              <div class="foto-previa" id="s-foto-previa" hidden>
+                <img alt="Prévia da foto escolhida">
+                <button type="button" class="btn-sec btn-sec--p" id="s-foto-remover">Remover foto</button>
+              </div>
+              <p class="campo__erro" hidden></p>
+            </div>
+          </div>
+
+          <!-- Correção -->
+          <div class="grupo-tipo" data-tipo="correcao" hidden>
+            <div class="campo" data-campo="quadraId">
+              <label class="campo__rotulo" for="s-quadra">Qual quadra <span class="obrig" aria-hidden="true">*</span></label>
+              <select class="entrada" id="s-quadra" name="quadraId">
+                <option value="">Escolha a quadra</option>
+              </select>
+              <p class="campo__erro" hidden></p>
+            </div>
+            <div class="campo" data-campo="descricao">
+              <label class="campo__rotulo" for="s-descricao">O que está errado <span class="obrig" aria-hidden="true">*</span></label>
+              <textarea class="entrada" id="s-descricao" name="descricao" maxlength="1000" rows="4" placeholder="Ex.: o aro de basquete foi retirado"></textarea>
+              <p class="campo__erro" hidden></p>
+            </div>
+          </div>
+
+          <!-- Contato (os dois tipos) -->
+          <div class="grupo-tipo" data-tipo="ambos" hidden>
+            <p class="form__secao">Seu contato <span class="opcional">(opcional)</span></p>
+            <p class="campo__ajuda campo__ajuda--topo">Só se a gente precisar tirar alguma dúvida.</p>
+            <div class="linha-2">
+              <div class="campo" data-campo="contatoNome">
+                <label class="campo__rotulo" for="s-contato-nome">Nome</label>
+                <input class="entrada" id="s-contato-nome" name="contatoNome" type="text" maxlength="80" autocomplete="given-name">
+                <p class="campo__erro" hidden></p>
+              </div>
+              <div class="campo" data-campo="contatoWhatsapp">
+                <label class="campo__rotulo" for="s-contato-zap">WhatsApp</label>
+                <input class="entrada" id="s-contato-zap" name="contatoWhatsapp" type="text" placeholder="(63) 99999-9999">
+                <p class="campo__erro" hidden></p>
+              </div>
+            </div>
+            <div class="campo campo--check" data-campo="consentimento" hidden>
+              <label class="check">
+                <input type="checkbox" id="s-consentimento" name="consentimento">
+                <span>Autorizo o uso do meu contato apenas para falar sobre esta sugestão.</span>
+              </label>
+              <p class="campo__erro" hidden></p>
+            </div>
+          </div>
+
+          <div class="hp" aria-hidden="true">
+            <label>Não preencha este campo <input type="text" name="site" tabindex="-1" autocomplete="off"></label>
+          </div>
+          <div class="form-falha-slot" id="s-falha"></div>
+        </form>
+        <div class="form-sucesso" hidden></div>
+      </div>
+    </div>
+
+    <div class="painel__rodape" id="sugerir-rodape">
+      <button type="submit" form="form-sugerir" class="btn-primario" id="s-enviar">Enviar sugestão</button>
+    </div>
+  </aside>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="js/config.js"></script>
   <script src="js/dados.js"></script>
@@ -79,6 +226,8 @@
   <script src="js/api.js"></script>
   <script src="js/icones.js"></script>
   <script src="js/navegacao.js"></script>
+  <script src="js/formularios.js"></script>
+  <script src="js/sugerir.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
