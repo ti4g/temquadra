@@ -151,9 +151,12 @@
         : 'Vamos revisar e, se estiver tudo certo, ela aparece no mapa.',
       aoEnviarOutra: function () {
         limpar();
+        Form.marcarChips(form, 'tipo', tipo);   // continua no mesmo modo (nova/correção)
+        mostrarTipo();
         Form.voltarAoFormulario(fluxo);
         rodape.hidden = false;
-        $('[data-campo="tipo"] input').focus();
+        const primeiro = form.querySelector(tipo === 'correcao' ? '#s-quadra' : '#s-nome');
+        if (primeiro) primeiro.focus();
       }
     });
   }
