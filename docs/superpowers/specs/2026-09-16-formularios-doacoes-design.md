@@ -152,7 +152,9 @@ css/admin.css         → estilos só do painel
 js/config.js          → CONFIG (ponto de coleta, WhatsApp)
 js/dados.js           → quadras de exemplo usadas pelo MOCK
 js/api.js             → ÚNICA porta de acesso a dados (mock hoje, Supabase depois)
-js/icones.js          → ICONE, EQUIP, ESTRUTURA, labels (saem do app.js)
+js/regras.js          → catálogos (pisos, modalidades, materiais…) e regras sem tela:
+                        validação, coordenada colada, WhatsApp, montar registros
+js/icones.js          → ícones SVG e cores dos pisos (saem do app.js)
 js/navegacao.js       → telas, painéis e botão voltar
 js/app.js             → mapa, lista, filtros, detalhe (já existe)
 js/formularios.js     → peças comuns: chips, validação, estados, WhatsApp, foto
@@ -161,6 +163,8 @@ js/doar.js            → tela "Doar materiais"
 js/admin.js           → lógica do admin.html
 supabase/schema.sql   → rascunho das tabelas e regras de segurança
 supabase/LEIA-ME.md   → passo a passo da conexão
+tests/*.test.js       → testes automáticos de regras.js e api.js (node --test)
+package.json          → só o atalho `npm test` (sem dependências)
 ```
 
 ### 6.1 Contrato do `js/api.js`
@@ -171,7 +175,7 @@ Todas as funções são **assíncronas** (devolvem Promise), porque no Supabase 
 | `Api.listarQuadras()` | quadras publicadas | `QUADRAS` de `dados.js` + quadras aprovadas no admin (localStorage) |
 | `Api.enviarSugestao(sugestao)` | grava sugestão com status `pendente` | salva no localStorage, espera 600 ms |
 | `Api.enviarDoacao(doacao)` | grava doação com status `nova` | salva no localStorage, espera 600 ms |
-| `Api.contarDoacoesEntregues()` | nº de doações com status `entregue` | conta no localStorage |
+| `Api.contarDoacoesEntregues()` | total de **peças** (soma de `quantidade`) das doações com status `entregue` | soma no localStorage |
 | `Api.entrar(email, senha)` | login do admin | aceita qualquer e-mail com senha `demo` |
 | `Api.sair()` / `Api.sessaoAtual()` | sessão do admin | localStorage |
 | `Api.listarSugestoes(status)` | só admin | localStorage |
@@ -347,24 +351,30 @@ Só existe **um** painel aberto por vez: abrir um fecha o outro sem empilhar de 
   `fotos` e `precisa` como `text[]`) + `publicada boolean default true` + `criado_em`.
 - `sugestoes` — item 4.2 (`dados jsonb` para os campos da quadra, `foto_path text`).
 - `doacoes` — item 4.3.
-- Bucket de armazenamento `fotos-sugestoes` (privado).
+- `admins` — `user_id` dos logins da dupla.
+- Bucket `fotos-sugestoes` (privado, até 5 MB, só JPEG/PNG/WEBP) e bucket `fotos-quadras`
+  (leitura pública, escrita só admin).
 
 ### 10.2 Regras de segurança (RLS) — obrigatórias
-| Tabela | Visitante (anon) | Admin (logado) |
+"Admin" = usuário logado **que está na tabela `admins`** (função `is_admin()`). Só estar logado
+não basta — proteção extra caso alguém esqueça de desligar o cadastro público.
+
+| Tabela | Visitante (anon) | Admin |
 |---|---|---|
 | `quadras` | **ler** só `publicada = true` | tudo |
 | `sugestoes` | **só inserir**, com `status = 'pendente'` | tudo |
 | `doacoes` | **só inserir**, com `status = 'nova'` | tudo |
 | bucket `fotos-sugestoes` | **só enviar** | ler e apagar |
 
-- O contador público usa uma função `contar_doacoes_entregues()` com `security definer`, que
+- O contador público usa uma função `total_materiais_entregues()` com `security definer`, que
   devolve **só o número**. Visitante nunca lê a tabela `doacoes` (tem WhatsApp das pessoas).
 - **Desligar cadastro público** no Auth do Supabase e criar os logins da dupla na mão. Senão
   qualquer um cria conta e vira "admin".
 - A chave `anon` pode ficar no site; a `service_role` **nunca**.
 
 ### 10.3 `supabase/LEIA-ME.md`
-Passo a passo: criar projeto → rodar `schema.sql` → desligar cadastro → criar usuários →
+Passo a passo: criar projeto → rodar `schema.sql` → desligar cadastro → criar usuários e
+colocar os ids na tabela `admins` →
 importar as quadras de `dados.js` → preencher URL e chave `anon` em `js/config.js` → trocar
 o miolo de cada função do `api.js` → testar com a checklist da seção 12.
 
