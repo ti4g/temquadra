@@ -93,7 +93,7 @@
         history.pushState({ tela: 'doar', painel: null }, '', '#doar');
       }
       aplicarTela('doar');
-      raiz.scrollTo(0, 0);
+      document.getElementById('tela-doar').scrollTop = 0;
     },
 
     voltarParaMapa: function () {
