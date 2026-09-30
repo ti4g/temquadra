@@ -1,0 +1,93 @@
+/* Layout Admin */
+.admin-header {
+  height: var(--topbar-h);
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.admin-container {
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
+.admin-actions-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card);
+  border-radius: var(--raio);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: var(--sombra);
+}
+
+.admin-table th, .admin-table td {
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-table th {
+  background: #f8fbfb;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* Modais */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 41, 46, 0.6);
+  display: grid;
+  place-items: center;
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal-content {
+  background: var(--card);
+  width: 100%;
+  max-width: 560px;
+  border-radius: var(--raio);
+  padding: 24px;
+  box-shadow: var(--sombra-forte);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Tamanho ampliado das imagens na tabela do Admin */
+.admin-table td img {
+    width: 100px;             /* Largura aumentada (era 50px) */
+    height: 80px;             /* Altura proporcional */
+    object-fit: cover;        /* Mantém a proporção sem distorcer */
+    border-radius: var(--raio-sm);
+    border: 1px solid var(--line);
+    box-shadow: var(--sombra);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Efeito ao passar o mouse por cima (Hover Zoom) */
+.admin-table td img:hover {
+    transform: scale(1.1);
+    box-shadow: var(--sombra-forte);
+}

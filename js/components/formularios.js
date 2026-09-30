@@ -20,7 +20,9 @@
   function lerChips(el, nome) {
     const inputs = el.querySelectorAll('input[name="' + nome + '"]');
     const marcados = [];
+
     inputs.forEach(function (i) { if (i.checked) marcados.push(i.value); });
+
     if (inputs.length && inputs[0].type === 'radio') return marcados[0] || '';
     return marcados;
   }
@@ -126,14 +128,14 @@
     const link = cfg.textoWhatsapp ? linkWhatsapp(cfg.textoWhatsapp) : null;
     slot.innerHTML =
       '<div class="form-falha" role="alert">' +
-        '<p class="form-falha__titulo">' + Icones.i('info') + 'Não conseguimos enviar agora.</p>' +
-        (cfg.detalhe ? '<p class="form-falha__detalhe">' + esc(cfg.detalhe) + '</p>' : '') +
-        '<p class="form-falha__detalhe">O que você preencheu continua aqui.</p>' +
-        '<div class="form-falha__acoes">' +
-          '<button type="button" class="btn-sec" data-tentar>Tentar de novo</button>' +
-          (link ? '<a class="btn-whats" href="' + esc(link) + '" target="_blank" rel="noopener">' +
-            Icones.i('whatsapp') + 'Enviar pelo WhatsApp</a>' : '') +
-        '</div>' +
+      '<p class="form-falha__titulo">' + Icones.i('info') + 'Não conseguimos enviar agora.</p>' +
+      (cfg.detalhe ? '<p class="form-falha__detalhe">' + esc(cfg.detalhe) + '</p>' : '') +
+      '<p class="form-falha__detalhe">O que você preencheu continua aqui.</p>' +
+      '<div class="form-falha__acoes">' +
+      '<button type="button" class="btn-sec" data-tentar>Tentar de novo</button>' +
+      (link ? '<a class="btn-whats" href="' + esc(link) + '" target="_blank" rel="noopener">' +
+        Icones.i('whatsapp') + 'Enviar pelo WhatsApp</a>' : '') +
+      '</div>' +
       '</div>';
     slot.querySelector('[data-tentar]').addEventListener('click', cfg.aoTentar);
     slot.scrollIntoView({ block: 'nearest', behavior: 'smooth' });

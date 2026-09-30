@@ -121,24 +121,21 @@
   }
 
   // ===== Envio =====
-  function lerFormulario() {
+ function lerFormulario() {
     return {
       tipo: tipoAtual(),
       nome: $('#s-nome').value,
       localizacao: localizacaoGps || Regras.extrairCoordenada($('#s-referencia').value),
       referencia: $('#s-referencia').value,
       piso: Form.lerChips(form, 'piso'),
-      modalidades: Form.lerChips(form, 'modalidades'),
-      equipamentos: Form.lerChips(form, 'equipamentos'),
-      estrutura: Form.lerChips(form, 'estrutura'),
       coberta: Form.lerChips(form, 'coberta'),
-      conservacao: Form.lerChips(form, 'conservacao'),
+      iluminacao: $('#s-iluminacao') ? $('#s-iluminacao').checked : false,
+      acessibilidade: $('#s-acessibilidade') ? $('#s-acessibilidade').checked : false, // <-- Captura da tela
       foto: fotoDataUrl,
       quadraId: $('#s-quadra').value,
       descricao: $('#s-descricao').value,
       contatoNome: $('#s-contato-nome').value,
-      contatoWhatsapp: $('#s-contato-zap').value,
-      consentimento: $('#s-consentimento').checked
+      contatoWhatsapp: $('#s-contato-zap').value
     };
   }
 

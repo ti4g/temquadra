@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TemQuadra - Login</title>
+    <link rel="stylesheet" href="css/estilos.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body class="login-page">
+
+    <div class="login-card">
+        <h2>TemQuadra</h2>
+        <p class="sub">Painel do Administrador</p>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <input class="entrada" type="email" id="email" required placeholder="admin@temquadra.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="passwords">Senha</label>
+                <input class="entrada" type="password" id="passwords" required placeholder="******">
+            </div>
+
+            <p id="errorMsg" class="campo__erro" style="display:none; margin-bottom: 12px;"></p>
+            
+            <button type="submit" class="btn-login" id="btnLogin">Entrar no Painel</button>
+        </form>
+    </div>
+
+    <!-- Importação modular do script de login -->
+    <script type="module" src="./js/pages/login-page.js"></script>
+</body>
+</html>

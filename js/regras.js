@@ -180,13 +180,19 @@
   function validarSugestao(f) {
     f = f || {};
     const erros = {};
+  
     if (f.tipo === 'nova') {
+
       if (texto(f.nome).length < 3) erros.nome = 'Informe o nome ou uma referência da quadra.';
+      
       if (!f.localizacao && !texto(f.referencia)) {
         erros.localizacao = 'Use sua localização ou cole um link / ponto de referência.';
       }
+
       if (!f.piso) erros.piso = 'Escolha o tipo de piso.';
+
       if (!lista(f.modalidades).length) erros.modalidades = 'Escolha pelo menos uma modalidade.';
+
     } else if (f.tipo === 'correcao') {
       if (!f.quadraId) erros.quadraId = 'Escolha a quadra.';
       if (texto(f.descricao).length < 10) erros.descricao = 'Conte o que está errado (pelo menos 10 caracteres).';
@@ -194,6 +200,8 @@
       erros.tipo = 'Escolha o que você quer fazer.';
       return erros;
     }
+
+
     const zap = texto(f.contatoWhatsapp);
     if (zap && !whatsappValido(zap)) erros.contatoWhatsapp = 'WhatsApp inválido. Use DDD + número.';
     if ((texto(f.contatoNome) || zap) && f.consentimento !== true) erros.consentimento = MSG_CONSENTIMENTO;

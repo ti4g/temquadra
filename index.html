@@ -1,31 +1,37 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quadras de Palmas</title>
-  <meta name="description" content="Mapa das quadras esportivas de Palmas (TO): tipo de piso, equipamentos, bebedouro, banheiro e doação de materiais esportivos.">
+  <meta name="description"
+    content="Mapa das quadras esportivas de Palmas (TO): tipo de piso, equipamentos, bebedouro, banheiro e doação de materiais esportivos.">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="css/estilos.css">
 </head>
+
 <body>
   <header class="topbar">
     <svg class="topbar__court" viewBox="0 0 300 100" aria-hidden="true">
       <g fill="none" stroke="currentColor" stroke-width="2.5">
-        <rect x="4" y="4" width="292" height="92" rx="6"/>
-        <line x1="150" y1="4" x2="150" y2="96"/>
-        <circle cx="150" cy="50" r="17"/>
-        <path d="M4 30h40v40H4M296 30h-40v40h40"/>
+        <rect x="4" y="4" width="292" height="92" rx="6" />
+        <line x1="150" y1="4" x2="150" y2="96" />
+        <circle cx="150" cy="50" r="17" />
+        <path d="M4 30h40v40H4M296 30h-40v40h40" />
       </g>
     </svg>
     <div class="topbar__brand">
       <span class="logo" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
-          <path d="M12 2C8.1 2 5 5 5 8.9c0 4.7 5.6 10.3 6.3 11a1 1 0 0 0 1.4 0c.7-.7 6.3-6.3 6.3-11C19 5 15.9 2 12 2Z" fill="#fff"/>
-          <circle cx="12" cy="9" r="2.4" fill="#0E8A95"/>
+          <path d="M12 2C8.1 2 5 5 5 8.9c0 4.7 5.6 10.3 6.3 11a1 1 0 0 0 1.4 0c.7-.7 6.3-6.3 6.3-11C19 5 15.9 2 12 2Z"
+            fill="#fff" />
+          <circle cx="12" cy="9" r="2.4" fill="#0E8A95" />
         </svg>
       </span>
       <div class="topbar__titulos">
@@ -35,19 +41,56 @@
     </div>
     <div class="topbar__acoes">
       <button type="button" class="btn-topo btn-topo--sec" id="btn-doar" aria-label="Doar materiais">
-        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 21.5l8.8-8.8a5 5 0 0 0 0-7.1z"/></svg>
+        <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 21.5l8.8-8.8a5 5 0 0 0 0-7.1z" />
+        </svg>
         <span>Doar materiais</span>
       </button>
       <button type="button" class="btn-topo" id="btn-sugerir" aria-label="Sugerir quadra">
-        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
         <span>Sugerir quadra</span>
       </button>
     </div>
   </header>
 
-  <!-- Tela: mapa + lista -->
+
+  <!-- Tela: mapa + lista com Barra de Pesquisa -->
+  <!-- Barra Superior com Filtros Dinâmicos -->
   <div class="tela-mapa" id="tela-mapa">
-    <nav class="filtros" id="filtros" aria-label="Filtros"></nav>
+    <div
+      style="padding: 12px 24px; background: var(--card); border-bottom: 1px solid var(--line); display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+      <input type="text" id="campo-busca" class="entrada" placeholder="🔍 Pesquisar por nome ou bairro..."
+        style="flex: 1; min-width: 250px; min-height: 40px;">
+    </div>
+
+    <nav class="filtros" id="filtros" aria-label="Filtros">
+      <div class="filtros__grupo">
+        <span class="filtros__rotulo">PISO</span>
+        <label class="chip"><input type="checkbox" data-grupo="piso" value="cimento"><span>Cimento</span></label>
+        <label class="chip"><input type="checkbox" data-grupo="piso"
+            value="emborrachado"><span>Emborrachado</span></label>
+        <label class="chip"><input type="checkbox" data-grupo="piso" value="areia"><span>Areia</span></label>
+        <label class="chip"><input type="checkbox" data-grupo="piso" value="gramado"><span>Gramado</span></label>
+      </div>
+
+      <div class="filtros__grupo">
+        <span class="filtros__rotulo">COBERTURA</span>
+        <label class="chip"><input type="checkbox" data-grupo="cobertura" value="coberta"><span>Coberta</span></label>
+        <label class="chip"><input type="checkbox" data-grupo="cobertura"
+            value="descoberta"><span>Descoberta</span></label>
+      </div>
+
+      <!-- Grupo de Recursos Unificado -->
+      <div class="filtros__grupo">
+        <span class="filtros__rotulo">RECURSOS</span>
+        <label class="chip"><input type="checkbox" data-grupo="recurso"
+            value="iluminacao"><span>Iluminação</span></label>
+        <label class="chip"><input type="checkbox" data-grupo="recurso" value="acessibilidade"><span>Acessibilidade
+            ♿</span></label>
+      </div>
+    </nav>
 
     <main class="app" id="app">
       <div class="alternador">
@@ -79,7 +122,9 @@
         <h2 class="painel__titulo" id="sugerir-titulo">Sugerir quadra</h2>
       </div>
       <button type="button" class="painel__fechar" data-fechar aria-label="Fechar" data-foco-inicial>
-        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
       </button>
     </div>
 
@@ -95,22 +140,31 @@
           <!-- Quadra nova -->
           <div class="grupo-tipo" data-tipo="nova" hidden>
             <div class="campo" data-campo="nome">
-              <label class="campo__rotulo" for="s-nome">Nome ou referência <span class="obrig" aria-hidden="true">*</span></label>
-              <input class="entrada" id="s-nome" name="nome" type="text" maxlength="120" autocomplete="off" placeholder="Ex.: Praça da 404 Sul" required>
+              <label class="campo__rotulo" for="s-nome">Nome ou referência <span class="obrig"
+                  aria-hidden="true">*</span></label>
+              <input class="entrada" id="s-nome" name="nome" type="text" maxlength="120" autocomplete="off"
+                placeholder="Ex.: Praça da 404 Sul" required>
               <p class="campo__erro" hidden></p>
             </div>
 
             <div class="campo" data-campo="localizacao">
               <span class="campo__rotulo">Onde fica <span class="obrig" aria-hidden="true">*</span></span>
               <button type="button" class="btn-gps" id="s-gps">
-                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3"/></svg>
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="3" />
+                  <circle cx="12" cy="12" r="8" />
+                  <path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3" />
+                </svg>
                 <span>Estou na quadra — usar minha localização</span>
               </button>
               <p class="local-status" id="s-local-status" role="status" hidden></p>
               <div class="ou" aria-hidden="true"><span>ou</span></div>
-              <label class="campo__rotulo campo__rotulo--sub" for="s-referencia">Link do Google Maps ou ponto de referência</label>
-              <input class="entrada" id="s-referencia" name="referencia" type="text" maxlength="300" autocomplete="off" placeholder="Cole o link, a coordenada ou descreva o lugar">
-              <p class="campo__ajuda">Dica: no Google Maps, clique com o botão direito no lugar (no celular, toque e segure) e copie os números.</p>
+              <label class="campo__rotulo campo__rotulo--sub" for="s-referencia">Link do Google Maps ou ponto de
+                referência</label>
+              <input class="entrada" id="s-referencia" name="referencia" type="text" maxlength="300" autocomplete="off"
+                placeholder="Cole o link, a coordenada ou descreva o lugar">
+              <p class="campo__ajuda">Dica: no Google Maps, clique com o botão direito no lugar (no celular, toque e
+                segure) e copie os números.</p>
               <p class="campo__erro" hidden></p>
             </div>
 
@@ -148,12 +202,28 @@
                 <div class="chips" data-chips="conservacao"></div>
               </fieldset>
             </div>
+            <fieldset class="campo" data-campo="recursos_extras">
+              <legend class="campo__rotulo">Recursos disponíveis</legend>
+              <div class="chips">
+                <label class="chip">
+                  <input type="checkbox" id="s-iluminacao" name="iluminacao">
+                  <span>💡 Iluminação Noturna</span>
+                </label>
+                <label class="chip">
+                  <input type="checkbox" id="s-acessibilidade" name="acessibilidade">
+                  <span>♿ Acessibilidade / Rampa</span>
+                </label>
+              </div>
+            </fieldset>
 
             <div class="campo" data-campo="foto">
               <span class="campo__rotulo">Foto da quadra <span class="opcional">(opcional)</span></span>
               <input class="foto-input" id="s-foto" type="file" accept="image/*">
               <label class="foto-escolher" for="s-foto">
-                <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg>
+                <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" />
+                  <circle cx="12" cy="13.5" r="3.5" />
+                </svg>
                 <span>Escolher ou tirar foto</span>
               </label>
               <div class="foto-previa" id="s-foto-previa" hidden>
@@ -167,15 +237,18 @@
           <!-- Correção -->
           <div class="grupo-tipo" data-tipo="correcao" hidden>
             <div class="campo" data-campo="quadraId">
-              <label class="campo__rotulo" for="s-quadra">Qual quadra <span class="obrig" aria-hidden="true">*</span></label>
+              <label class="campo__rotulo" for="s-quadra">Qual quadra <span class="obrig"
+                  aria-hidden="true">*</span></label>
               <select class="entrada" id="s-quadra" name="quadraId">
                 <option value="">Escolha a quadra</option>
               </select>
               <p class="campo__erro" hidden></p>
             </div>
             <div class="campo" data-campo="descricao">
-              <label class="campo__rotulo" for="s-descricao">O que está errado <span class="obrig" aria-hidden="true">*</span></label>
-              <textarea class="entrada" id="s-descricao" name="descricao" maxlength="1000" rows="4" placeholder="Ex.: o aro de basquete foi retirado"></textarea>
+              <label class="campo__rotulo" for="s-descricao">O que está errado <span class="obrig"
+                  aria-hidden="true">*</span></label>
+              <textarea class="entrada" id="s-descricao" name="descricao" maxlength="1000" rows="4"
+                placeholder="Ex.: o aro de basquete foi retirado"></textarea>
               <p class="campo__erro" hidden></p>
             </div>
           </div>
@@ -187,12 +260,14 @@
             <div class="linha-2">
               <div class="campo" data-campo="contatoNome">
                 <label class="campo__rotulo" for="s-contato-nome">Nome</label>
-                <input class="entrada" id="s-contato-nome" name="contatoNome" type="text" maxlength="80" autocomplete="given-name">
+                <input class="entrada" id="s-contato-nome" name="contatoNome" type="text" maxlength="80"
+                  autocomplete="given-name">
                 <p class="campo__erro" hidden></p>
               </div>
               <div class="campo" data-campo="contatoWhatsapp">
                 <label class="campo__rotulo" for="s-contato-zap">WhatsApp</label>
-                <input class="entrada" id="s-contato-zap" name="contatoWhatsapp" type="text" placeholder="(63) 99999-9999">
+                <input class="entrada" id="s-contato-zap" name="contatoWhatsapp" type="text"
+                  placeholder="(63) 99999-9999">
                 <p class="campo__erro" hidden></p>
               </div>
             </div>
@@ -231,4 +306,5 @@
   <script src="js/doar.js"></script>
   <script src="js/app.js"></script>
 </body>
+
 </html>
