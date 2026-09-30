@@ -617,3 +617,204 @@ select.entrada {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+/* =========================================================
+   Melhorias Visuais dos Modais e Painéis Laterais
+   ========================================================= */
+
+/* --- Overlay / Fundo Escurecido com Desfoque --- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 41, 46, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: grid;
+  place-items: center;
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 16px;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* --- Container do Modal --- */
+.modal-content {
+  background: var(--card, #ffffff);
+  width: 100%;
+  max-width: 540px;
+  border-radius: var(--raio, 16px);
+  padding: 28px;
+  box-shadow: 0 20px 40px -15px rgba(18, 41, 46, 0.25);
+  border: 1px solid var(--line, #e1e8e8);
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: translateY(12px) scale(0.98);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-overlay.active .modal-content {
+  transform: translateY(0) scale(1);
+}
+
+.modal-content h3 {
+  font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink, #12292e);
+  letter-spacing: -0.02em;
+  margin: 0 0 16px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line, #e1e8e8);
+}
+
+/* --- Painel Lateral Slide-Over (Detalhes do Mapa) --- */
+.painel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  max-width: 400px;
+  height: 100vh;
+  background: var(--card, #ffffff);
+  box-shadow: -8px 0 32px rgba(18, 41, 46, 0.18);
+  z-index: 1200;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.painel.active {
+  transform: translateX(0);
+}
+
+/* Botão Fechar Redondo */
+.detalhe__fechar {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  background: rgba(18, 41, 46, 0.65);
+  backdrop-filter: blur(4px);
+  color: #ffffff;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.detalhe__fechar:hover {
+  background: rgba(18, 41, 46, 0.9);
+  transform: scale(1.05);
+}
+
+/* Hero e Imagem do Detalhe */
+.detalhe__hero {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  flex: none;
+  background: var(--paper, #eff3f3);
+  overflow: hidden;
+}
+
+.detalhe__hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detalhe__heroInfo {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 32px 20px 16px;
+  color: #ffffff;
+  background: linear-gradient(to top, rgba(6, 20, 23, 0.85), transparent);
+}
+
+.detalhe__heroInfo h2 {
+  font-family: var(--font-display, sans-serif);
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.detalhe__heroInfo .mono {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.85;
+  margin-top: 4px;
+}
+
+/* Corpo e Etiquetas de Recursos */
+.detalhe__corpo {
+  padding: 20px;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detalhe__grid-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.info-card {
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--paper, #eff3f3);
+  border: 1px solid var(--line, #e1e8e8);
+}
+
+.info-card__label {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--ink-soft, #5b7077);
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+
+.info-card__value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink, #12292e);
+}
+
+.detalhe__rodape {
+  padding: 16px 20px;
+  border-top: 1px solid var(--line, #e1e8e8);
+  background: var(--card, #ffffff);
+  flex: none;
+}
+
+/* Responsividade para Telas Menores */
+@media (max-width: 820px) {
+  .painel {
+    max-width: 100%;
+  }
+  .modal-content {
+    padding: 20px;
+  }
+}

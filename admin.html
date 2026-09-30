@@ -1,104 +1,136 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TemQuadra - Painel Admin</title>
-    <link rel="stylesheet" href="css/estilos.css">
-    <link rel="stylesheet" href="css/dashboard.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TemQuadra - Painel Admin</title>
+  <link rel="stylesheet" href="css/estilos.css">
+  <link rel="stylesheet" href="css/dashboard.css">
 </head>
+
 <body>
 
-    <header class="admin-header">
-        <h1 class="brand__name">TemQuadra <span style="font-size: 14px; font-weight: normal;">| Admin</span></h1>
-        <div>
-            <span id="uName" style="margin-right: 12px; font-weight: 600;"></span>
-            <button id="btnLogout" class="btn-topo btn-topo--sec">Sair</button>
-        </div>
-    </header>
+  <header class="admin-header">
+    <h1 class="brand__name">TemQuadra <span style="font-size: 14px; font-weight: normal;">| Admin</span></h1>
+    <div>
+      <span id="uName" style="margin-right: 12px; font-weight: 600;"></span>
+      <button id="btnLogout" class="btn-topo btn-topo--sec">Sair</button>
+    </div>
+  </header>
 
-    <main class="admin-container">
-        <div class="admin-actions-bar">
-            <h2>Gerenciamento de Quadras</h2>
-            <button id="btnNovaQuadra" class="btn-topo">+ Nova Quadra</button>
-        </div>
-
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>Foto</th>
-                    <th>Nome</th>
-                    <th>Bairro</th>
-                    <th>Piso</th>
-                    <th>Cobertura</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="tBodyQuadras">
-                <tr><td colspan="6">Carregando quadras...</td></tr>
-            </tbody>
-        </table>
-    </main>
-
-    <!-- Modal de Cadastro / Edição -->
-    <div class="modal-overlay" id="modalQuadra">
-        <div class="modal-content">
-            <h3 id="modalTitulo">Cadastrar Quadra</h3>
-            <form id="formQuadra" style="margin-top: 16px;">
-                <input type="hidden" id="qId">
-                
-                <div class="form-group">
-                    <label>Nome da Quadra</label>
-                    <input class="entrada" id="qNome" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Endereço</label>
-                    <input class="entrada" id="qEndereco" required>
-                </div>
-
-                <div class="linha-2">
-                    <div class="form-group">
-                        <label>Bairro / Região</label>
-                        <input class="entrada" id="qBairro">
-                    </div>
-                    <div class="form-group">
-                        <label>Tipo do Piso</label>
-                        <select class="entrada" id="qPiso">
-                            <option value="CIMENTO">Cimento</option>
-                            <option value="EMBORRACHADO">Emborrachado</option>
-                            <option value="AREIA">Areia</option>
-                            <option value="GRAMADO">Gramado</option>
-                            <option value="GRAMA_SINTETICA">Grama Sintética</option>
-                            <option value="OUTRO">Outro</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="linha-2">
-                    <div class="form-group">
-                        <label>Cobertura</label>
-                        <select class="entrada" id="qCobertura">
-                            <option value="DESCOBERTA">Descoberta</option>
-                            <option value="COBERTA">Coberta</option>
-                            <option value="PARCIALMENTE_COBERTA">Parcialmente Coberta</option>
-                        </select>
-                    </div>
-                    <div class="form-group" id="divFotos">
-                        <label>Fotos (MinIO)</label>
-                        <input type="file" id="qFotos" multiple accept="image/*">
-                    </div>
-                </div>
-
-                <div style="display: flex; gap: 12px; margin-top: 20px;">
-                    <button type="submit" class="btn-primario">Salvar</button>
-                    <button type="button" id="btnFecharModal" class="btn-sec">Cancelar</button>
-                </div>
-            </form>
-        </div>
+  <main class="admin-container">
+    <div class="admin-actions-bar">
+      <h2>Gerenciamento de Quadras</h2>
+      <button id="btnNovaQuadra" class="btn-topo">+ Nova Quadra</button>
     </div>
 
-    <!-- O controlador da página é importado como Módulo ES6 -->
-    <script type="module" src="js/pages/admin-page.js"></script>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Foto</th>
+          <th>Nome</th>
+          <th>Bairro</th>
+          <th>Piso</th>
+          <th>Cobertura</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tBodyQuadras">
+        <tr>
+          <td colspan="6">Carregando quadras...</td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
+
+ 
+  <!-- Modal de Cadastro / Edição -->
+  <div class="modal-overlay" id="modalQuadra">
+    <div class="modal-content">
+      <h3 id="modalTitulo">Cadastrar Quadra</h3>
+      <form id="formQuadra" style="margin-top: 16px;">
+        <input type="hidden" id="qId">
+
+        <div class="form-group">
+          <label>Nome da Quadra</label>
+          <input class="entrada" id="qNome" required>
+        </div>
+
+        <div class="form-group">
+          <label>Endereço</label>
+          <input class="entrada" id="qEndereco" required>
+        </div>
+
+        <!-- Linha para Bairro e Tipo de Piso -->
+        <div class="linha-2">
+          <div class="form-group">
+            <label>Bairro / Região</label>
+            <input class="entrada" id="qBairro">
+          </div>
+          <div class="form-group">
+            <label>Tipo do Piso</label>
+            <select class="entrada" id="qPiso">
+              <option value="CIMENTO">Cimento</option>
+              <option value="EMBORRACHADO">Emborrachado</option>
+              <option value="AREIA">Areia</option>
+              <option value="GRAMADO">Gramado</option>
+              <option value="GRAMA_SINTETICA">Grama Sintética</option>
+              <option value="OUTRO">Outro</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- NOVO: Linha para Latitude e Longitude -->
+        <div class="linha-2">
+          <div class="form-group">
+            <label>Latitude</label>
+            <input class="entrada" type="number" step="any" id="qLatitude" placeholder="-10.2085">
+          </div>
+          <div class="form-group">
+            <label>Longitude</label>
+            <input class="entrada" type="number" step="any" id="qLongitude" placeholder="-48.3470">
+          </div>
+        </div>
+
+        <!-- Linha para Cobertura e Fotos -->
+        <div class="linha-2">
+          <div class="form-group">
+            <label>Cobertura</label>
+            <select class="entrada" id="qCobertura">
+              <option value="DESCOBERTA">Descoberta</option>
+              <option value="COBERTA">Coberta</option>
+              <option value="PARCIALMENTE_COBERTA">Parcialmente Coberta</option>
+            </select>
+          </div>
+          <div class="form-group" id="divFotos">
+            <label>Fotos (MinIO)</label>
+            <input type="file" id="qFotos" multiple accept="image/*">
+          </div>
+        </div>
+
+        <!-- NOVO: Linha de Recursos (Iluminação e Acessibilidade) -->
+        <div class="linha-2" style="margin-top: 10px;">
+          <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="qIluminacao" style="width: 18px; height: 18px;">
+            <label for="qIluminacao" style="margin: 0; cursor: pointer;">💡 Possui Iluminação</label>
+          </div>
+          <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="qAcessibilidade" style="width: 18px; height: 18px;">
+            <label for="qAcessibilidade" style="margin: 0; cursor: pointer;">♿ Possui Acessibilidade</label>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 20px;">
+          <button type="submit" class="btn-primario">Salvar</button>
+          <button type="button" id="btnFecharModal" class="btn-sec">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- O controlador da página é importado como Módulo ES6 -->
+  <script type="module" src="js/pages/admin-page.js"></script>
 </body>
+
 </html>

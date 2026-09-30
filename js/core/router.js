@@ -6,7 +6,7 @@ export function verificarAcessoAdmin() {
     const ehPaginaAdmin = window.location.pathname.includes('admin.html');
     
     if (ehPaginaAdmin && !estaAutenticado()) {
-        window.location.href = 'index.html';
+        window.location.href = 'login.html';
     }
 }
 
