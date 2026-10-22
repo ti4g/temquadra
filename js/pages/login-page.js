@@ -1,40 +1,41 @@
+// js/pages/login-page.js
 import { login, estaAutenticado } from '../services/auth.service.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Se o usuário já estiver autenticado, redireciona direto para o Dashboard
+    // Quem já está logado vai direto pro painel
     if (estaAutenticado()) {
         window.location.href = 'admin.html';
         return;
     }
 
     const form = document.getElementById('loginForm');
-    const errorMsg = document.getElementById('errorMsg');
-    const btnLogin = document.getElementById('btnLogin');
+    const erro = document.getElementById('errorMsg');
+    const botao = document.getElementById('btnLogin');
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const email = document.getElementById('email').value.trim();
-        const passwords = document.getElementById('passwords').value;
+        const senha = document.getElementById('passwords').value;
+        erro.hidden = true;
 
-        // Limpa mensagens de erro anteriores
-        errorMsg.style.display = 'none';
-        errorMsg.textContent = '';
-        
-        // Estado visual de carregamento
-        btnLogin.disabled = true;
-        btnLogin.textContent = 'Autenticando...';
+        if (!email || !senha) {
+            erro.textContent = 'Preencha o e-mail e a senha.';
+            erro.hidden = false;
+            return;
+        }
+
+        botao.disabled = true;
+        botao.textContent = 'Entrando…';
 
         try {
-            await login(email, passwords);
-            // Redireciona para o Painel Administrativo após o login
+            await login(email, senha);
             window.location.href = 'admin.html';
         } catch (err) {
-            errorMsg.style.display = 'block';
-            errorMsg.textContent = err.message || 'Credenciais inválidas. Verifique seu e-mail e senha.';
-        } finally {
-            btnLogin.disabled = false;
-            btnLogin.textContent = 'Entrar no Painel';
+            erro.textContent = 'E-mail ou senha não conferem. Confira e tente de novo.';
+            erro.hidden = false;
+            botao.disabled = false;
+            botao.textContent = 'Entrar';
         }
     });
 });

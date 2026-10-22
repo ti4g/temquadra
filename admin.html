@@ -3,133 +3,125 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TemQuadra - Painel Admin</title>
-  <link rel="stylesheet" href="css/estilos.css">
-  <link rel="stylesheet" href="css/dashboard.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F2F5F8">
+  <title>Equipe · TemQuadra</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,600..800&family=Figtree:wght@400..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/painel.css">
 </head>
 
-<body>
-
-  <header class="admin-header">
-    <h1 class="brand__name">TemQuadra <span style="font-size: 14px; font-weight: normal;">| Admin</span></h1>
-    <div>
-      <span id="uName" style="margin-right: 12px; font-weight: 600;"></span>
-      <button id="btnLogout" class="btn-topo btn-topo--sec">Sair</button>
+<body class="pagina-admin">
+  <header class="admin-topo">
+    <div class="admin-topo__marca">
+      <a class="marca" href="index.html" aria-label="TemQuadra, ver o mapa">
+        <span class="marca__selo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2">
+            <rect x="6" y="2.5" width="12" height="19" rx="1.5" />
+            <path d="M6 12h12M9.5 2.5v3h5v-3M9.5 21.5v-3h5v3" />
+            <circle cx="12" cy="12" r="2.4" />
+          </svg>
+        </span>
+        TemQuadra
+      </a>
+      <span class="admin-topo__selo">Equipe</span>
+    </div>
+    <div class="admin-topo__usuario">
+      <span class="admin-topo__nome" id="uName"></span>
+      <button type="button" class="btn-icone" id="btnLogout" aria-label="Sair" title="Sair"></button>
     </div>
   </header>
 
-  <main class="admin-container">
-    <div class="admin-actions-bar">
-      <h2>Gerenciamento de Quadras</h2>
-      <button id="btnNovaQuadra" class="btn-topo">+ Nova Quadra</button>
+  <main class="admin">
+    <div class="admin__saudacao">
+      <h1 id="saudacao">Oi!</h1>
+      <p id="resumo" aria-live="polite">Carregando…</p>
     </div>
 
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>Foto</th>
-          <th>Nome</th>
-          <th>Bairro</th>
-          <th>Piso</th>
-          <th>Cobertura</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody id="tBodyQuadras">
-        <tr>
-          <td colspan="6">Carregando quadras...</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="abas" role="tablist" aria-label="Seções">
+      <button type="button" class="aba" role="tab" id="aba-quadras" aria-controls="sec-quadras" aria-selected="true">
+        Quadras <span class="aba__contagem" id="cont-quadras">0</span>
+      </button>
+      <button type="button" class="aba" role="tab" id="aba-sugestoes" aria-controls="sec-sugestoes" aria-selected="false" tabindex="-1">
+        Sugestões <span class="aba__contagem" id="cont-sugestoes">0</span>
+      </button>
+    </div>
+
+    <section id="sec-quadras" role="tabpanel" aria-labelledby="aba-quadras">
+      <div class="admin__barra">
+        <input type="search" class="entrada" id="filtro-quadras" placeholder="Filtrar quadras" aria-label="Filtrar quadras">
+        <button type="button" class="btn btn--primario" id="btnNovaQuadra"></button>
+      </div>
+      <ul class="linhas" id="lista-quadras" style="margin-top:14px"></ul>
+    </section>
+
+    <section id="sec-sugestoes" role="tabpanel" aria-labelledby="aba-sugestoes" hidden>
+      <div class="linhas" id="lista-sugestoes"></div>
+    </section>
   </main>
 
- 
-  <!-- Modal de Cadastro / Edição -->
-  <div class="modal-overlay" id="modalQuadra">
-    <div class="modal-content">
-      <h3 id="modalTitulo">Cadastrar Quadra</h3>
-      <form id="formQuadra" style="margin-top: 16px;">
-        <input type="hidden" id="qId">
-
-        <div class="form-group">
-          <label>Nome da Quadra</label>
-          <input class="entrada" id="qNome" required>
-        </div>
-
-        <div class="form-group">
-          <label>Endereço</label>
-          <input class="entrada" id="qEndereco" required>
-        </div>
-
-        <!-- Linha para Bairro e Tipo de Piso -->
-        <div class="linha-2">
-          <div class="form-group">
-            <label>Bairro / Região</label>
-            <input class="entrada" id="qBairro">
-          </div>
-          <div class="form-group">
-            <label>Tipo do Piso</label>
-            <select class="entrada" id="qPiso">
-              <option value="CIMENTO">Cimento</option>
-              <option value="EMBORRACHADO">Emborrachado</option>
-              <option value="AREIA">Areia</option>
-              <option value="GRAMADO">Gramado</option>
-              <option value="GRAMA_SINTETICA">Grama Sintética</option>
-              <option value="OUTRO">Outro</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- NOVO: Linha para Latitude e Longitude -->
-        <div class="linha-2">
-          <div class="form-group">
-            <label>Latitude</label>
-            <input class="entrada" type="number" step="any" id="qLatitude" placeholder="-10.2085">
-          </div>
-          <div class="form-group">
-            <label>Longitude</label>
-            <input class="entrada" type="number" step="any" id="qLongitude" placeholder="-48.3470">
-          </div>
-        </div>
-
-        <!-- Linha para Cobertura e Fotos -->
-        <div class="linha-2">
-          <div class="form-group">
-            <label>Cobertura</label>
-            <select class="entrada" id="qCobertura">
-              <option value="DESCOBERTA">Descoberta</option>
-              <option value="COBERTA">Coberta</option>
-              <option value="PARCIALMENTE_COBERTA">Parcialmente Coberta</option>
-            </select>
-          </div>
-          <div class="form-group" id="divFotos">
-            <label>Fotos (MinIO)</label>
-            <input type="file" id="qFotos" multiple accept="image/*">
-          </div>
-        </div>
-
-        <!-- NOVO: Linha de Recursos (Iluminação e Acessibilidade) -->
-        <div class="linha-2" style="margin-top: 10px;">
-          <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
-            <input type="checkbox" id="qIluminacao" style="width: 18px; height: 18px;">
-            <label for="qIluminacao" style="margin: 0; cursor: pointer;">💡 Possui Iluminação</label>
-          </div>
-          <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
-            <input type="checkbox" id="qAcessibilidade" style="width: 18px; height: 18px;">
-            <label for="qAcessibilidade" style="margin: 0; cursor: pointer;">♿ Possui Acessibilidade</label>
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 12px; margin-top: 20px;">
-          <button type="submit" class="btn-primario">Salvar</button>
-          <button type="button" id="btnFecharModal" class="btn-sec">Cancelar</button>
-        </div>
-      </form>
+  <!-- Cadastro / edição de quadra -->
+  <dialog class="folha" id="modalQuadra" aria-labelledby="modalTitulo">
+    <div class="folha__topo">
+      <h2 id="modalTitulo">Nova quadra</h2>
+      <button type="button" class="btn-icone" id="btnFecharModal" aria-label="Fechar"></button>
     </div>
-  </div>
+    <form class="folha__corpo form" id="formQuadra" novalidate>
+      <input type="hidden" id="qId">
 
-  <!-- O controlador da página é importado como Módulo ES6 -->
+      <div class="campo">
+        <label class="campo__rotulo" for="qNome">Nome da quadra</label>
+        <input class="entrada" id="qNome" required>
+        <p class="campo__erro" hidden>A quadra precisa de um nome.</p>
+      </div>
+      <div class="campo">
+        <label class="campo__rotulo" for="qEndereco">Endereço</label>
+        <input class="entrada" id="qEndereco" required>
+        <p class="campo__erro" hidden>Informe o endereço.</p>
+      </div>
+      <div class="campo">
+        <label class="campo__rotulo" for="qBairro">Quadra ou bairro</label>
+        <input class="entrada" id="qBairro" placeholder="Ex.: 305 Sul">
+      </div>
+
+      <fieldset>
+        <legend>Local no mapa</legend>
+        <div id="qLocal"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Tipo de piso</legend>
+        <div class="escolhas" id="qPisos"></div>
+      </fieldset>
+      <fieldset>
+        <legend>Cobertura</legend>
+        <div class="escolhas" id="qCoberturas"></div>
+      </fieldset>
+
+      <label class="interruptor">Tem iluminação à noite<input type="checkbox" id="qIluminacao"></label>
+      <div id="qExtras" style="display:contents"></div>
+
+      <div class="campo">
+        <label class="campo__rotulo" for="qDescricao">Descrição (opcional)</label>
+        <textarea class="entrada" id="qDescricao"></textarea>
+      </div>
+
+      <fieldset id="divFotos">
+        <legend>Fotos (até 5)</legend>
+        <div class="fotos" id="qFotos"></div>
+      </fieldset>
+      <p class="campo__dica" id="avisoFotos" hidden>Por enquanto a API só recebe fotos no cadastro. Pra trocar as fotos, cadastre a quadra de novo.</p>
+    </form>
+    <div class="folha__rodape">
+      <button type="button" class="btn btn--claro" id="btnCancelar">Cancelar</button>
+      <button type="submit" form="formQuadra" class="btn btn--primario" id="btnSalvar">Salvar quadra</button>
+    </div>
+  </dialog>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script type="module" src="js/pages/admin-page.js"></script>
 </body>
 

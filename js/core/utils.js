@@ -41,6 +41,39 @@ export function extrairCoordenada(entrada) {
     return null;
 }
 
+/** Minúsculas e sem acento, pra busca não depender de "Ginásio" x "ginasio". */
+export function normalizarTexto(valor) {
+    return String(valor == null ? '' : valor)
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .toLowerCase().trim();
+}
+
+/**
+ * Reduz uma foto do celular antes do envio (lado maior até `max` px, JPEG).
+ * O back aceita no máximo 1 MB por arquivo, e foto de celular costuma passar disso.
+ */
+export function reduzirImagem(arquivo, { max = 1600, qualidade = 0.82 } = {}) {
+    return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(arquivo);
+        const img = new Image();
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            const escala = Math.min(1, max / Math.max(img.width, img.height));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.round(img.width * escala);
+            canvas.height = Math.round(img.height * escala);
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(blob => {
+                if (!blob) return reject(new Error('Não deu pra ler essa imagem.'));
+                const nome = arquivo.name.replace(/\.[^.]+$/, '') + '.jpg';
+                resolve(new File([blob], nome, { type: 'image/jpeg' }));
+            }, 'image/jpeg', qualidade);
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Esse arquivo não é uma imagem.')); };
+        img.src = url;
+    });
+}
+
 /**
  * Aplica máscara de telefone / WhatsApp enquanto o usuário digita (Ex: (63) 99999-9999)[cite: 31].
  */
