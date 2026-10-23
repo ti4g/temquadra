@@ -1,93 +1,307 @@
-/* Layout Admin */
+/* =========================================================
+   TEMQUADRA ADMIN - PAINEL FUTURISTA & MINIMALISTA
+   ========================================================= */
+
+:root {
+  --admin-bg: #0b171a;
+  --admin-card: rgba(18, 41, 46, 0.7);
+  --admin-card-solid: #12292e;
+  --admin-border: rgba(225, 232, 232, 0.12);
+  --admin-border-accent: rgba(14, 138, 149, 0.3);
+  --admin-primary: #0e8a95;
+  --admin-primary-hover: #12a5b2;
+  --admin-text-main: #f0f4f4;
+  --admin-text-muted: #8e9d9d;
+  --admin-success: #10b981;
+  --admin-danger: #ef4444;
+  --admin-warning: #f59e0b;
+}
+
+body {
+  background-color: var(--admin-bg);
+  color: var(--admin-text-main);
+  font-family: var(--font-body, 'Figtree', sans-serif);
+  margin: 0;
+  min-height: 100vh;
+}
+
+/* Header Futurista Transparente */
 .admin-header {
-  height: var(--topbar-h);
-  background: var(--card);
-  border-bottom: 1px solid var(--line);
+  height: 68px;
+  background: rgba(11, 23, 26, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--admin-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 32px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
+.admin-header h1 {
+  font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin: 0;
+}
+
+.admin-header .badge-admin {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  background: rgba(14, 138, 149, 0.2);
+  border: 1px solid var(--admin-primary);
+  color: #38bdf8;
+  border-radius: 20px;
+  margin-left: 8px;
+}
+
+/* Container e Ações Primárias */
 .admin-container {
-  max-width: 1100px;
-  margin: 24px auto;
-  padding: 0 16px;
+  max-width: 1240px;
+  margin: 32px auto;
+  padding: 0 24px;
 }
 
 .admin-actions-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* NAVEGAÇÃO POR ABAS */
+.admin-tabs {
+  display: flex;
+  gap: 8px;
+  background: rgba(18, 41, 46, 0.4);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--admin-border);
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--admin-text-muted);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-btn:hover {
+  color: var(--admin-text-main);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.tab-btn.active {
+  background: var(--admin-primary);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(14, 138, 149, 0.4);
+}
+
+.tab-badge {
+  background: var(--admin-warning);
+  color: #000;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+
+/* TABELAS DESIGN FUTURISTA */
+.admin-table-container {
+  background: var(--admin-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--admin-border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
 .admin-table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--card);
-  border-radius: var(--raio);
-  overflow: hidden;
-  border: 1px solid var(--line);
-  box-shadow: var(--sombra);
+  text-align: left;
 }
 
 .admin-table th, .admin-table td {
-  padding: 14px 16px;
-  text-align: left;
-  border-bottom: 1px solid var(--line);
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--admin-border);
+  vertical-align: middle;
 }
 
 .admin-table th {
-  background: #f8fbfb;
-  font-family: var(--font-mono);
+  background: rgba(11, 23, 26, 0.6);
+  font-family: var(--font-mono, monospace);
   font-size: 11px;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  letter-spacing: 0.08em;
+  color: var(--admin-text-muted);
 }
 
-/* Modais */
+.admin-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.admin-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.thumb-img {
+  width: 72px;
+  height: 52px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--admin-border);
+}
+
+.badge-status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.status-pendente { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+.status-aprovado { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+
+/* BOTÕES DE AÇÃO */
+.btn-action {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid var(--admin-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--admin-text-main);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-right: 6px;
+}
+
+.btn-action:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.btn-approve {
+  background: var(--admin-primary);
+  border-color: var(--admin-primary);
+  color: #fff;
+}
+
+.btn-approve:hover {
+  background: var(--admin-primary-hover);
+  box-shadow: 0 0 12px rgba(14, 138, 149, 0.5);
+}
+
+.btn-danger {
+  color: var(--admin-danger);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* MODAL DESIGN */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(18, 41, 46, 0.6);
+  background: rgba(5, 12, 14, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: grid;
   place-items: center;
   z-index: 2000;
   opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+  padding: 16px;
 }
 
 .modal-overlay.active {
   opacity: 1;
-  pointer-events: all;
+  visibility: visible;
 }
 
 .modal-content {
-  background: var(--card);
+  background: var(--admin-card-solid);
   width: 100%;
-  max-width: 560px;
-  border-radius: var(--raio);
-  padding: 24px;
-  box-shadow: var(--sombra-forte);
+  max-width: 580px;
+  border-radius: 20px;
+  padding: 28px;
+  border: 1px solid var(--admin-border-accent);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
   max-height: 90vh;
   overflow-y: auto;
 }
 
-/* Tamanho ampliado das imagens na tabela do Admin */
-.admin-table td img {
-    width: 100px;             /* Largura aumentada (era 50px) */
-    height: 80px;             /* Altura proporcional */
-    object-fit: cover;        /* Mantém a proporção sem distorcer */
-    border-radius: var(--raio-sm);
-    border: 1px solid var(--line);
-    box-shadow: var(--sombra);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+.modal-content h3 {
+  font-family: var(--font-display, sans-serif);
+  font-size: 22px;
+  font-weight: 800;
+  color: #ffffff;
+  margin-top: 0;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--admin-border);
 }
 
-/* Efeito ao passar o mouse por cima (Hover Zoom) */
-.admin-table td img:hover {
-    transform: scale(1.1);
-    box-shadow: var(--sombra-forte);
+/* FORMULÁRIOS FUTURISTAS */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-family: var(--font-mono, monospace);
+  text-transform: uppercase;
+  color: var(--admin-text-muted);
+  margin-bottom: 6px;
+  letter-spacing: 0.05em;
+}
+
+.entrada-admin {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(11, 23, 26, 0.7);
+  border: 1px solid var(--admin-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: #ffffff;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.entrada-admin:focus {
+  border-color: var(--admin-primary);
+  box-shadow: 0 0 0 3px rgba(14, 138, 149, 0.25);
+}
+
+.linha-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }

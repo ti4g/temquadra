@@ -1,5 +1,5 @@
 // js/core/router.js
-import { estaAutenticado } from '../services/auth.service.js';
+import { estaAutenticado } from '../services/auth_service.js';
 
 export function verificarAcessoAdmin() {
     // Se tentar acessar uma página administrativa sem estar logado

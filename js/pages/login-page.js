@@ -1,4 +1,4 @@
-import { login, estaAutenticado } from '../services/auth.service.js';
+import { login, estaAutenticado } from '../services/auth_service.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Se o usuário já estiver autenticado, redireciona direto para o Dashboard

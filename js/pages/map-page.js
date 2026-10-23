@@ -1,6 +1,8 @@
 // js/pages/map-page.js
-import { listarQuadras } from '../services/quadras.service.js';
+import { listarQuadras } from '../services/quadras_service.js';
 import { escaparHtml } from '../core/utils.js';
+import { inicializarSugerir } from '../components/sugerir.js';
+
 
 let map;
 let camadaMarcadores;
@@ -13,6 +15,8 @@ const ZOOM_INICIAL = 13;
 document.addEventListener('DOMContentLoaded', () => {
     iniciarMapa();
     carregarQuadras();
+    inicializarSugerir();
+
 
     // Eventos de Busca por Texto e Filtros de Chips
     document.getElementById('campo-busca')?.addEventListener('input', aplicarFiltros);
@@ -128,7 +132,9 @@ function renderCards(lista) {
 
 /**
  * Abertura fluida do Painel Lateral de Detalhes
- */function abrirDetalhe(id) {
+ */
+
+function abrirDetalhe(id) {
     const q = quadras.find(item => item.id === id);
     if (!q) return;
 

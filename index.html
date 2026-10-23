@@ -5,17 +5,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quadras de Palmas</title>
-  <meta name="description" content="Mapa das quadras esportivas de Palmas (TO): tipo de piso, equipamentos e recursos de iluminação/acessibilidade.">
-  
-  <!-- Leaflet CSS e Estilos da Aplicação -->
+  <meta name="description"
+    content="Mapa das quadras esportivas de Palmas (TO): tipo de piso, equipamentos e recursos de iluminação/acessibilidade.">
+
+  <!-- Estilos das Bibliotecas Externas e da Aplicação -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="css/estilos.css">
 </head>
 
 <body>
+  <!-- Cabeçalho Principal -->
   <header class="topbar">
     <svg class="topbar__court" viewBox="0 0 300 100" aria-hidden="true">
       <g fill="none" stroke="currentColor" stroke-width="2.5">
@@ -28,7 +32,8 @@
     <div class="topbar__brand">
       <span class="logo" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
-          <path d="M12 2C8.1 2 5 5 5 8.9c0 4.7 5.6 10.3 6.3 11a1 1 0 0 0 1.4 0c.7-.7 6.3-6.3 6.3-11C19 5 15.9 2 12 2Z" fill="#fff" />
+          <path d="M12 2C8.1 2 5 5 5 8.9c0 4.7 5.6 10.3 6.3 11a1 1 0 0 0 1.4 0c.7-.7 6.3-6.3 6.3-11C19 5 15.9 2 12 2Z"
+            fill="#fff" />
           <circle cx="12" cy="9" r="2.4" fill="#0E8A95" />
         </svg>
       </span>
@@ -38,21 +43,25 @@
       </div>
     </div>
     <div class="topbar__acoes">
-      <!-- Botão de Entrar / Login adicionado antes de "Doar materiais" -->
-      <a href="admin.html" class="btn-topo btn-topo--sec" id="btn-login" aria-label="Entrar no sistema" style="text-decoration: none; display: inline-flex; align-items: center;">
-        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: 18px; height: 18px; margin-right: 6px;">
+      <!-- Botão de Entrar / Login direcionando ao Painel Administrative/Login -->
+      <a href="admin.html" class="btn-topo btn-topo--sec" id="btn-login" aria-label="Entrar no sistema"
+        style="text-decoration: none; display: inline-flex; align-items: center;">
+        <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" aria-hidden="true" style="width: 18px; height: 18px; margin-right: 6px;">
           <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
           <polyline points="10 17 15 12 10 7" />
           <line x1="15" y1="12" x2="3" y2="12" />
         </svg>
         <span>Entrar</span>
       </a>
+
       <button type="button" class="btn-topo btn-topo--sec" id="btn-doar" aria-label="Doar materiais">
         <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 0 0-7.1 7.1L12 21.5l8.8-8.8a5 5 0 0 0 0-7.1z" />
         </svg>
         <span>Doar materiais</span>
       </button>
+
       <button type="button" class="btn-topo" id="btn-sugerir" aria-label="Sugerir quadra">
         <svg class="i" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 5v14M5 12h14" />
@@ -62,17 +71,20 @@
     </div>
   </header>
 
-  <!-- Barra de Pesquisa e Filtros -->
+  <!-- Barra de Pesquisa e Filtros Multicritério -->
   <div class="tela-mapa" id="tela-mapa">
-    <div style="padding: 12px 24px; background: var(--card); border-bottom: 1px solid var(--line); display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
-      <input type="text" id="campo-busca" class="entrada" placeholder="🔍 Pesquisar por nome ou bairro..." style="flex: 1; min-width: 250px; min-height: 40px;">
+    <div
+      style="padding: 12px 24px; background: var(--card); border-bottom: 1px solid var(--line); display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+      <input type="text" id="campo-busca" class="entrada" placeholder="🔍 Pesquisar por nome ou bairro..."
+        style="flex: 1; min-width: 250px; min-height: 40px;">
     </div>
 
     <nav class="filtros" id="filtros" aria-label="Filtros">
       <div class="filtros__grupo">
         <span class="filtros__rotulo">PISO</span>
         <label class="chip"><input type="checkbox" data-grupo="piso" value="cimento"><span>Cimento</span></label>
-        <label class="chip"><input type="checkbox" data-grupo="piso" value="emborrachado"><span>Emborrachado</span></label>
+        <label class="chip"><input type="checkbox" data-grupo="piso"
+            value="emborrachado"><span>Emborrachado</span></label>
         <label class="chip"><input type="checkbox" data-grupo="piso" value="areia"><span>Areia</span></label>
         <label class="chip"><input type="checkbox" data-grupo="piso" value="gramado"><span>Gramado</span></label>
       </div>
@@ -80,13 +92,16 @@
       <div class="filtros__grupo">
         <span class="filtros__rotulo">COBERTURA</span>
         <label class="chip"><input type="checkbox" data-grupo="cobertura" value="coberta"><span>Coberta</span></label>
-        <label class="chip"><input type="checkbox" data-grupo="cobertura" value="descoberta"><span>Descoberta</span></label>
+        <label class="chip"><input type="checkbox" data-grupo="cobertura"
+            value="descoberta"><span>Descoberta</span></label>
       </div>
 
       <div class="filtros__grupo">
         <span class="filtros__rotulo">RECURSOS</span>
-        <label class="chip"><input type="checkbox" data-grupo="recurso" value="iluminacao"><span>Iluminação</span></label>
-        <label class="chip"><input type="checkbox" data-grupo="recurso" value="acessibilidade"><span>Acessibilidade ♿</span></label>
+        <label class="chip"><input type="checkbox" data-grupo="recurso"
+            value="iluminacao"><span>Iluminação</span></label>
+        <label class="chip"><input type="checkbox" data-grupo="recurso" value="acessibilidade"><span>Acessibilidade
+            ♿</span></label>
       </div>
     </nav>
 
@@ -107,13 +122,99 @@
     </main>
   </div>
 
-  <!-- Painéis laterais -->
+  <!-- Painel Lateral Deslizante (Slide-Over) de Detalhes da Quadra -->
   <aside class="painel detalhe" id="detalhe" aria-label="Detalhes da quadra"></aside>
+
+  <!-- Painel Lateral Deslizante para Sugerir Quadra -->
+  <aside class="painel painel-form" id="sugerir" aria-labelledby="sugerir-titulo">
+    <div class="painel__topo">
+      <div>
+        <p class="painel__eyebrow">Colabore com o mapa</p>
+        <h2 class="painel__titulo" id="sugerir-titulo">Sugerir quadra</h2>
+      </div>
+      <button type="button" class="painel__fechar" data-fechar aria-label="Fechar">✕</button>
+    </div>
+
+    <div class="painel__corpo">
+      <form class="form" id="form-sugerir" novalidate>
+        <div class="campo">
+          <label class="campo__rotulo" for="s-nome">Nome ou referência <span class="obrig">*</span></label>
+          <input class="entrada" id="s-nome" name="nome" type="text" placeholder="Ex.: Quadra Poliesportiva da 405 Sul" required>
+        </div>
+
+        <div class="campo">
+        <label class="campo__rotulo" for="s-bairro">Bairro ou Região</label>
+       <input class="entrada" id="s-bairro" name="bairroRegiao" type="text" placeholder="Ex.: 305 Norte, Taquaralto, Arse 12">
+       </div>
+
+        <div class="campo">
+          <span class="campo__rotulo">Localização</span>
+          <button type="button" class="btn-gps" id="s-gps" style="margin-bottom: 8px;">
+            <span>📍 Usar minha localização atual (GPS)</span>
+          </button>
+          <p class="local-status" id="s-local-status" hidden></p>
+          <input class="entrada" id="s-referencia" name="referencia" type="text"
+            placeholder="Ou cole o link do Google Maps / Ponto de referência">
+        </div>
+       
+        <div class="campo">
+  <label class="campo__rotulo" for="s-descricao">Descrição / Observações</label>
+  <textarea class="entrada" id="s-descricao" name="descricao" rows="3" placeholder="Ex.: Possui alambrado furado e iluminação funcionando até 22h."></textarea>
+</div>
+
+        <fieldset class="campo">
+          <legend class="campo__rotulo">Tipo do Piso</legend>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="piso" value="cimento" checked><span>Cimento</span></label>
+            <label class="chip"><input type="radio" name="piso" value="emborrachado"><span>Emborrachado</span></label>
+            <label class="chip"><input type="radio" name="piso" value="areia"><span>Areia</span></label>
+            <label class="chip"><input type="radio" name="piso" value="gramado"><span>Gramado</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="campo">
+          <legend class="campo__rotulo">Cobertura</legend>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="coberta" value="sim"><span>Sim</span></label>
+            <label class="chip"><input type="radio" name="coberta" value="nao" checked><span>Não</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="campo">
+          <legend class="campo__rotulo">Recursos disponíveis</legend>
+          <div class="chips">
+            <label class="chip"><input type="checkbox" id="s-iluminacao" name="iluminacao"><span>💡 Iluminação
+                Noturna</span></label>
+            <label class="chip"><input type="checkbox" id="s-acessibilidade" name="acessibilidade"><span>♿
+                Acessibilidade / Rampa</span></label>
+          </div>
+        </fieldset>
+
+        <div class="campo">
+          <label class="campo__rotulo" for="s-foto">Foto da quadra </label>
+          <input class="entrada" id="s-foto" type="file" accept="image/*">
+        </div>
+
+        <div class="campo">
+          <label class="campo__rotulo" for="s-contato-nome">Seu Nome (opcional)</label>
+          <input class="entrada" id="s-contato-nome" type="text" placeholder="Ex.: João Silva">
+        </div>
+
+        <div class="campo">
+          <label class="campo__rotulo" for="s-contato-zap">Seu WhatsApp (opcional)</label>
+          <input class="entrada" id="s-contato-zap" type="text" placeholder="(63) 99999-9999">
+        </div>
+
+        <button type="submit" class="btn-primario" id="s-enviar" style="margin-top: 16px;">Enviar sugestão</button>
+      </form>
+    </div>
+  </aside>
 
   <!-- Biblioteca Externa Leaflet (JS) -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  
-  <!-- Controlador Módulo ES6 da Página Inicial -->
+
+  <!-- Módulo Controlador da Página (Gerencia o Mapa, Filtros e a Sugestão de Quadras) -->
   <script type="module" src="js/pages/map-page.js"></script>
 </body>
+
 </html>

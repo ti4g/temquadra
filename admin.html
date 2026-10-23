@@ -4,73 +4,105 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TemQuadra - Painel Admin</title>
+  <title>TemQuadra — Painel de Controle</title>
   <link rel="stylesheet" href="css/estilos.css">
   <link rel="stylesheet" href="css/dashboard.css">
 </head>
 
 <body>
 
+  <!-- Topbar Futurista -->
   <header class="admin-header">
-    <h1 class="brand__name">TemQuadra <span style="font-size: 14px; font-weight: normal;">| Admin</span></h1>
-    <div>
-      <span id="uName" style="margin-right: 12px; font-weight: 600;"></span>
-      <button id="btnLogout" class="btn-topo btn-topo--sec">Sair</button>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <h1>TemQuadra</h1>
+      <span class="badge-admin">Painel Admin</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <span id="uName" style="font-size: 14px; font-weight: 600; color: var(--admin-text-main);">Admin</span>
+      <button id="btnLogout" class="btn-action btn-danger">Sair</button>
     </div>
   </header>
 
   <main class="admin-container">
+    <!-- Barra Superior: Abas e Ação Principal -->
     <div class="admin-actions-bar">
-      <h2>Gerenciamento de Quadras</h2>
-      <button id="btnNovaQuadra" class="btn-topo">+ Nova Quadra</button>
+      <div class="admin-tabs">
+        <button class="tab-btn active" id="tabQuadras" data-tab="quadras">
+          <span>🏟️ Quadras do Mapa</span>
+        </button>
+        <button class="tab-btn" id="tabSugestoes" data-tab="sugestoes">
+          <span>💡 Sugestões Recebidas</span>
+          <span class="tab-badge" id="badgeSugestoes">0</span>
+        </button>
+      </div>
+
+      <button id="btnNovaQuadra" class="btn-action btn-approve" style="padding: 10px 18px;">+ Cadastrar Quadra</button>
     </div>
 
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>Foto</th>
-          <th>Nome</th>
-          <th>Bairro</th>
-          <th>Piso</th>
-          <th>Cobertura</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody id="tBodyQuadras">
-        <tr>
-          <td colspan="6">Carregando quadras...</td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Tabela 1: Quadras do Mapa -->
+    <div class="admin-table-container" id="secQuadras">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Foto</th>
+            <th>Nome da Quadra</th>
+            <th>Bairro / Região</th>
+            <th>Piso</th>
+            <th>Cobertura</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tBodyQuadras">
+          <tr><td colspan="6" style="text-align: center; color: var(--admin-text-muted);">Carregando quadras...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tabela 2: Sugestões Recebidas -->
+    <div class="admin-table-container" id="secSugestoes" style="display: none;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Foto</th>
+            <th>Quadra Sugerida</th>
+            <th>Solicitante</th>
+            <th>Piso / Cobertura</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tBodySugestoes">
+          <tr><td colspan="6" style="text-align: center; color: var(--admin-text-muted);">Carregando sugestões...</td></tr>
+        </tbody>
+      </table>
+    </div>
   </main>
 
- 
-  <!-- Modal de Cadastro / Edição -->
+  <!-- Modal 1: Cadastro / Edição de Quadras -->
   <div class="modal-overlay" id="modalQuadra">
     <div class="modal-content">
       <h3 id="modalTitulo">Cadastrar Quadra</h3>
-      <form id="formQuadra" style="margin-top: 16px;">
+      <form id="formQuadra">
         <input type="hidden" id="qId">
 
         <div class="form-group">
           <label>Nome da Quadra</label>
-          <input class="entrada" id="qNome" required>
+          <input class="entrada-admin" id="qNome" required placeholder="Ex.: Quadra da 305 Norte">
         </div>
 
         <div class="form-group">
           <label>Endereço</label>
-          <input class="entrada" id="qEndereco" required>
+          <input class="entrada-admin" id="qEndereco" required placeholder="Ex.: Alameda 2, Quadra 305 Norte">
         </div>
 
-        <!-- Linha para Bairro e Tipo de Piso -->
         <div class="linha-2">
           <div class="form-group">
             <label>Bairro / Região</label>
-            <input class="entrada" id="qBairro">
+            <input class="entrada-admin" id="qBairro" placeholder="Ex.: Plano Diretor Norte">
           </div>
           <div class="form-group">
             <label>Tipo do Piso</label>
-            <select class="entrada" id="qPiso">
+            <select class="entrada-admin" id="qPiso">
               <option value="CIMENTO">Cimento</option>
               <option value="EMBORRACHADO">Emborrachado</option>
               <option value="AREIA">Areia</option>
@@ -81,23 +113,21 @@
           </div>
         </div>
 
-        <!-- NOVO: Linha para Latitude e Longitude -->
         <div class="linha-2">
           <div class="form-group">
             <label>Latitude</label>
-            <input class="entrada" type="number" step="any" id="qLatitude" placeholder="-10.2085">
+            <input class="entrada-admin" type="number" step="any" id="qLatitude" placeholder="-10.2085">
           </div>
           <div class="form-group">
             <label>Longitude</label>
-            <input class="entrada" type="number" step="any" id="qLongitude" placeholder="-48.3470">
+            <input class="entrada-admin" type="number" step="any" id="qLongitude" placeholder="-48.3470">
           </div>
         </div>
 
-        <!-- Linha para Cobertura e Fotos -->
         <div class="linha-2">
           <div class="form-group">
             <label>Cobertura</label>
-            <select class="entrada" id="qCobertura">
+            <select class="entrada-admin" id="qCobertura">
               <option value="DESCOBERTA">Descoberta</option>
               <option value="COBERTA">Coberta</option>
               <option value="PARCIALMENTE_COBERTA">Parcialmente Coberta</option>
@@ -105,31 +135,47 @@
           </div>
           <div class="form-group" id="divFotos">
             <label>Fotos (MinIO)</label>
-            <input type="file" id="qFotos" multiple accept="image/*">
+            <input type="file" class="entrada-admin" id="qFotos" multiple accept="image/*">
           </div>
         </div>
 
-        <!-- NOVO: Linha de Recursos (Iluminação e Acessibilidade) -->
         <div class="linha-2" style="margin-top: 10px;">
           <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
             <input type="checkbox" id="qIluminacao" style="width: 18px; height: 18px;">
-            <label for="qIluminacao" style="margin: 0; cursor: pointer;">💡 Possui Iluminação</label>
+            <label for="qIluminacao" style="margin: 0; cursor: pointer; text-transform: none; color: #fff;">💡 Iluminação Noturna</label>
           </div>
           <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
             <input type="checkbox" id="qAcessibilidade" style="width: 18px; height: 18px;">
-            <label for="qAcessibilidade" style="margin: 0; cursor: pointer;">♿ Possui Acessibilidade</label>
+            <label for="qAcessibilidade" style="margin: 0; cursor: pointer; text-transform: none; color: #fff;">♿ Acessibilidade / Rampa</label>
           </div>
         </div>
 
-        <div style="display: flex; gap: 12px; margin-top: 20px;">
-          <button type="submit" class="btn-primario">Salvar</button>
-          <button type="button" id="btnFecharModal" class="btn-sec">Cancelar</button>
+        <div style="display: flex; gap: 12px; margin-top: 24px;">
+          <button type="submit" class="btn-action btn-approve" style="flex: 1; padding: 12px;">Salvar Quadra</button>
+          <button type="button" id="btnFecharModal" class="btn-action">Cancelar</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- O controlador da página é importado como Módulo ES6 -->
+  <!-- Modal 2: Visualizar e Aprovar Sugestão -->
+  <div class="modal-overlay" id="modalSugestao">
+    <div class="modal-content">
+      <h3>Análise de Sugestão</h3>
+      <div id="detalheSugestaoConteudo"></div>
+      
+      <div class="form-group" style="margin-top: 16px;">
+        <label>Observação do Administrador (Opcional)</label>
+        <textarea class="entrada-admin" id="sugestaoObsAdmin" rows="2" placeholder="Ex.: Dados validados via foto de satélite."></textarea>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 20px;">
+        <button type="button" id="btnConfirmarAprovacao" class="btn-action btn-approve" style="flex: 1; padding: 12px;">✅ Aprovar e Publicar no Mapa</button>
+        <button type="button" id="btnFecharModalSugestao" class="btn-action">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="js/pages/admin-page.js"></script>
 </body>
 
