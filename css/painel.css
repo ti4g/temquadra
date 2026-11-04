@@ -1,0 +1,500 @@
+/* =========================================================
+   TEMQUADRA ADMIN - PAINEL FUTURISTA & MODAIS NATIVOS
+   ========================================================= */
+
+:root {
+  --admin-bg: #0B132B;
+  --admin-sidebar-bg: #1C2541;
+  --admin-sidebar-text: #E2E8F0;
+  --admin-card-bg: #1C2541;
+  --admin-border: rgba(255, 255, 255, 0.08);
+  --admin-primary: #00F0FF;
+  --admin-primary-hover: #00C8D6;
+  --admin-primary-glow: rgba(0, 240, 255, 0.25);
+  --admin-danger: #FF0055;
+  --admin-success: #00FF66;
+  --admin-warning: #FFB800;
+  --admin-text-main: #F8FAFC;
+  --admin-text-muted: #94A3B8;
+  --admin-input-bg: #0F172A;
+  --raio-card: 16px;
+  --raio-btn: 10px;
+}
+
+body.pagina-admin {
+  margin: 0;
+  background-color: var(--admin-bg);
+  font-family: 'Figtree', sans-serif;
+  color: var(--admin-text-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.admin-wrapper {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* SIDEBAR FUTURISTA */
+.admin-sidebar {
+  width: 270px;
+  background-color: var(--admin-sidebar-bg);
+  border-right: 1px solid var(--admin-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-shrink: 0;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 100;
+}
+
+.admin-sidebar__topo {
+  padding: 24px 20px;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-sidebar__marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #FFFFFF;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.marca__selo {
+  font-size: 18px;
+  filter: drop-shadow(0 0 8px var(--admin-primary));
+}
+
+.admin-sidebar__menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 12px;
+}
+
+.admin-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: var(--raio-btn);
+  color: var(--admin-text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.admin-nav-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+  color: #FFFFFF;
+  border-color: var(--admin-border);
+}
+
+.admin-nav-item.active {
+  background: rgba(0, 240, 255, 0.08);
+  color: var(--admin-primary);
+  border-color: var(--admin-primary);
+  box-shadow: 0 0 15px var(--admin-primary-glow);
+}
+
+.admin-nav-badge {
+  background: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+.admin-nav-badge--alerta {
+  background: var(--admin-warning);
+  color: #000;
+}
+
+.admin-sidebar__rodape {
+  padding: 20px;
+  border-top: 1px solid var(--admin-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ÁREA PRINCIPAL */
+.admin-conteudo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.admin-topbar {
+  height: 70px;
+  background: rgba(28, 37, 65, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--admin-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar-left h1 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+
+.btn-toggle-menu {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #FFF;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.admin-main {
+  padding: 32px;
+  flex: 1;
+}
+
+.admin__barra {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+/* LINHAS E LISTAGEM */
+.linhas {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.linha {
+  background: var(--admin-card-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--raio-card);
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 60px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.linha:hover {
+  border-color: rgba(0, 240, 255, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.linha__foto {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: var(--admin-input-bg);
+}
+
+.linha__info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.linha__nome {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--admin-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.linha__meta {
+  font-size: 13px;
+  color: var(--admin-text-muted);
+}
+
+.linha__acoes {
+  display: flex;
+  gap: 8px;
+}
+
+/* BOTÕES GERAIS */
+.btn {
+  padding: 10px 20px;
+  border-radius: var(--raio-btn);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn--primario {
+  background-color: var(--admin-primary);
+  color: #0B132B;
+  box-shadow: 0 0 15px var(--admin-primary-glow);
+}
+
+.btn--primario:hover {
+  background-color: var(--admin-primary-hover);
+  box-shadow: 0 0 25px var(--admin-primary-glow);
+}
+
+.btn--claro {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--admin-text-main);
+  border: 1px solid var(--admin-border);
+}
+
+.btn--claro:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-icone {
+  background: transparent;
+  border: none;
+  color: var(--admin-text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.btn-icone:hover {
+  color: #FFF;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.entrada {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: var(--admin-input-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--raio-btn);
+  color: var(--admin-text-main);
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.entrada:focus {
+  border-color: var(--admin-primary);
+  box-shadow: 0 0 12px var(--admin-primary-glow);
+}
+
+/* STATUS BADGES */
+.status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status--PENDENTE {
+  background: rgba(255, 184, 0, 0.15);
+  color: var(--admin-warning);
+  border: 1px solid var(--admin-warning);
+}
+
+.status--APROVADO {
+  background: rgba(0, 255, 102, 0.15);
+  color: var(--admin-success);
+  border: 1px solid var(--admin-success);
+}
+
+/* =========================================================
+   ESTILIZAÇÃO CORRIGIDA DO MODAL NATAL <dialog class="folha">
+   ========================================================= */
+
+dialog.folha {
+  border: 1px solid var(--admin-border);
+  border-radius: 20px;
+  padding: 0;
+  width: calc(100% - 32px);
+  max-width: 560px;
+  background: #161F38;
+  color: var(--admin-text-main);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  position: fixed;
+  inset: 0;
+  margin: auto;
+}
+
+dialog.folha::backdrop {
+  background: rgba(11, 19, 43, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+dialog.folha[open] {
+  animation: modalAparecer 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalAparecer {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.folha__topo {
+  padding: 20px 24px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--admin-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.folha__topo h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  color: var(--admin-primary);
+}
+
+.folha__corpo {
+  padding: 24px;
+  max-height: 65vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo__rotulo {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--admin-text-muted);
+  letter-spacing: 0.05em;
+}
+
+.folha__rodape {
+  padding: 16px 24px;
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid var(--admin-border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* CARDS DE DETALHES */
+.grid-detalhes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.card-detalhe-item {
+  background: var(--admin-input-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-detalhe-item__rotulo {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--admin-text-muted);
+  text-transform: uppercase;
+}
+
+.card-detalhe-item__valor {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--admin-text-main);
+  word-break: break-word;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+  }
+
+  .admin-sidebar.aberta {
+    transform: translateX(0);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .btn-toggle-menu {
+    display: block;
+  }
+
+  .admin-main {
+    padding: 16px;
+  }
+
+  .linha {
+    grid-template-columns: 1fr;
+  }
+
+  .linha__acoes {
+    justify-content: flex-end;
+  }
+}

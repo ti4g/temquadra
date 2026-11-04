@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
+<<<<<<< HEAD
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quadras de Palmas</title>
   <meta name="description"
@@ -87,8 +88,75 @@
             value="emborrachado"><span>Emborrachado</span></label>
         <label class="chip"><input type="checkbox" data-grupo="piso" value="areia"><span>Areia</span></label>
         <label class="chip"><input type="checkbox" data-grupo="piso" value="gramado"><span>Gramado</span></label>
-      </div>
+=======
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F2F5F8">
+  <title>TemQuadra · Quadras públicas de Palmas</title>
+  <meta name="description" content="Ache uma quadra pública perto de você em Palmas (TO): tipo de piso, cobertura, iluminação e o caminho até lá.">
 
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,600..800&family=Figtree:wght@400..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/mapa.css">
+</head>
+
+<body class="pagina-mapa">
+  <div id="mapa" class="mapa" role="region" aria-label="Mapa das quadras"></div>
+
+  <!-- Topo: marca, busca e filtros (flutua sobre o mapa) -->
+  <header class="topo" id="topo">
+    <div class="topo__linha">
+      <a class="marca" href="index.html" aria-label="TemQuadra, início">
+        <span class="marca__selo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2">
+            <rect x="6" y="2.5" width="12" height="19" rx="1.5" />
+            <path d="M6 12h12M9.5 2.5v3h5v-3M9.5 21.5v-3h5v3" />
+            <circle cx="12" cy="12" r="2.4" />
+          </svg>
+        </span>
+        TemQuadra
+      </a>
+      <div class="topo__acoes">
+        <button type="button" class="btn-icone" id="btn-doar" aria-label="Doar materiais esportivos" title="Doar materiais"></button>
+        <button type="button" class="btn btn--primario btn--p" id="btn-sugerir"></button>
+      </div>
+    </div>
+
+    <label class="busca">
+      <span class="so-leitor">Buscar quadra</span>
+      <span class="busca__icone" aria-hidden="true"></span>
+      <input type="search" id="campo-busca" placeholder="Buscar por nome ou quadra (ex.: 305 Sul)" autocomplete="off" enterkeyhint="search">
+      <button type="button" class="busca__limpar" id="busca-limpar" aria-label="Limpar busca" hidden></button>
+    </label>
+
+    <div class="filtros" id="filtros" role="group" aria-label="Filtros">
+      <button type="button" class="chip chip--perto" id="btn-perto" aria-pressed="false"></button>
+      <!-- chips de piso/cobertura/recursos são montados pelo JS -->
+    </div>
+  </header>
+
+  <!-- Gaveta com a lista de quadras -->
+  <section class="gaveta" id="gaveta" aria-labelledby="gaveta-titulo">
+    <div class="gaveta__alca" id="gaveta-alca">
+      <span class="gaveta__puxador" aria-hidden="true"></span>
+      <h1 class="gaveta__titulo" id="gaveta-titulo">Quadras públicas em Palmas</h1>
+      <p class="gaveta__sub">De graça e abertas pra todo mundo. Escolha uma pra ver como ela é e o caminho até lá.</p>
+      <p class="gaveta__contador" id="contador" aria-live="polite"></p>
+    </div>
+    <div class="gaveta__corpo" id="gaveta-corpo">
+      <ul class="lista" id="lista" aria-label="Quadras encontradas"></ul>
+      <div class="convite">
+        <p class="convite__texto">Conhece uma quadra que ainda não está no mapa?</p>
+        <button type="button" class="btn btn--escuro btn--bloco" data-abrir="sugerir">Sugerir quadra</button>
+>>>>>>> e897a4c9850108e7800024fdfabd297c4e7cbf1e
+      </div>
+      <a class="link-equipe" href="login.html">Área da equipe</a>
+    </div>
+  </section>
+
+<<<<<<< HEAD
       <div class="filtros__grupo">
         <span class="filtros__rotulo">COBERTURA</span>
         <label class="chip"><input type="checkbox" data-grupo="cobertura" value="coberta"><span>Coberta</span></label>
@@ -218,3 +286,17 @@
 </body>
 
 </html>
+=======
+  <!-- Painéis: detalhe, sugerir, doar -->
+  <div class="veu" id="veu" hidden></div>
+  <section class="painel" id="painel-detalhe" aria-label="Detalhes da quadra" aria-hidden="true" inert></section>
+  <section class="painel" id="painel-sugerir" aria-labelledby="sugerir-titulo" aria-hidden="true" inert></section>
+  <section class="painel" id="painel-doar" aria-labelledby="doar-titulo" aria-hidden="true" inert></section>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/config/config.js"></script>
+  <script type="module" src="js/pages/map-page.js"></script>
+</body>
+
+</html>
+>>>>>>> e897a4c9850108e7800024fdfabd297c4e7cbf1e

@@ -1,73 +1,26 @@
-body.login-page {
-  display: grid;
-  place-items: center;
-  min-height: 100vh;
-  background-color: var(--paper, #f4f6f9);
-}
 
-.login-card {
-  width: 100%;
-  max-width: 420px;
-  padding: 32px 28px;
-  background: var(--card, #ffffff);
-  border: 1px solid var(--line, #e0e0e0);
-  border-radius: var(--raio, 8px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+/* ---------- Login ---------- */
+.pagina-login {
+  min-height: 100dvh;
+  display: grid; place-items: center;
+  padding: 24px 16px calc(24px + env(safe-area-inset-bottom));
+  background: #1478C4;
+  overflow-x: hidden;
 }
-
-.login-card h2 {
-  font-family: var(--font-display, sans-serif);
-  font-size: 26px;
-  color: var(--ink, #2c3e50);
-  margin-bottom: 6px;
-  text-align: center;
+.login__quadra { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.login { position: relative; width: min(420px, 100%); display: grid; gap: 22px; justify-items: center; }
+.marca--clara { color: var(--branco); font-size: 22px; }
+.marca--clara .marca__selo { background: var(--tinta); }
+.login__cartao {
+  width: 100%; padding: 28px 22px;
+  border-radius: var(--raio-gaveta); background: var(--branco);
+  box-shadow: var(--sombra-2);
 }
-
-.login-card p.sub {
-  color: var(--ink-soft, #7f8c8d);
-  font-size: 14px;
-  text-align: center;
-  margin-bottom: 24px;
+.login__cartao h1 { font-size: 30px; font-variation-settings: "wdth" 88; letter-spacing: -.035em; }
+.login__sub { margin: 6px 0 22px; color: var(--tinta-2); }
+.login__erro {
+  padding: 12px 14px; border-radius: 12px;
+  background: #FDECEA; color: var(--perigo); font-weight: 600; font-size: 14px;
 }
-
-.form-group {
-  margin-bottom: 16px;
-}
-
-.form-group label {
-  display: block;
-  font-size: 13.5px;
-  font-weight: 700;
-  color: var(--ink, #2c3e50);
-  margin-bottom: 6px;
-}
-
-.campo__erro {
-  color: var(--coral, #e74c3c);
-  font-size: 13px;
-  padding: 8px 12px;
-  background: rgba(231, 76, 60, 0.1);
-  border-radius: 4px;
-  border-left: 3px solid var(--coral, #e74c3c);
-}
-
-.btn-login {
-  width: 100%;
-  min-height: 44px;
-  border-radius: 6px;
-  background: var(--ink, #2c3e50);
-  color: #ffffff;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  transition: background 0.15s ease-in-out;
-}
-
-.btn-login:hover {
-  background: #1a252f;
-}
-
-.btn-login:disabled {
-  background: #bdc3c7;
-  cursor: not-allowed;
-}
+.login__voltar { color: var(--branco); font-weight: 650; text-decoration: none; padding: 8px; }
+.login__voltar:hover { text-decoration: underline; }

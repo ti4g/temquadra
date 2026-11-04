@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
+<<<<<<< HEAD
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TemQuadra — Painel de Controle</title>
   <link rel="stylesheet" href="css/estilos.css">
@@ -88,13 +89,61 @@
         <div class="form-group">
           <label>Nome da Quadra</label>
           <input class="entrada-admin" id="qNome" required placeholder="Ex.: Quadra da 305 Norte">
-        </div>
+=======
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0F172A">
+  <title>Painel Admin · TemQuadra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,600..800&family=Figtree:wght@400..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/painel.css">
+</head>
 
+<body class="pagina-admin">
+  <div class="admin-wrapper">
+    <!-- Menu Lateral (Sidebar) -->
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div>
+        <div class="admin-sidebar__topo">
+          <a class="admin-sidebar__marca" href="index.html">
+            <span class="marca__selo">⚡</span>
+            TemQuadra
+          </a>
+>>>>>>> e897a4c9850108e7800024fdfabd297c4e7cbf1e
+        </div>
+        <nav class="admin-sidebar__menu">
+          <button type="button" class="admin-nav-item active" id="aba-quadras" data-tab="sec-quadras">
+            <span>🏟️ Quadras</span>
+            <span class="admin-nav-badge" id="cont-quadras">0</span>
+          </button>
+          <button type="button" class="admin-nav-item" id="aba-sugestoes" data-tab="sec-sugestoes">
+            <span>💡 Sugestões</span>
+            <span class="admin-nav-badge admin-nav-badge--alerta" id="cont-sugestoes">0</span>
+          </button>
+          <button type="button" class="admin-nav-item" id="aba-pontos" data-tab="sec-pontos">
+            <span>📍 Pontos de Doação</span>
+            <span class="admin-nav-badge" id="cont-pontos">0</span>
+          </button>
+        </nav>
+      </div>
+
+<<<<<<< HEAD
         <div class="form-group">
           <label>Endereço</label>
           <input class="entrada-admin" id="qEndereco" required placeholder="Ex.: Alameda 2, Quadra 305 Norte">
+=======
+      <div class="admin-sidebar__rodape">
+        <div class="user-info">
+          <span class="user-avatar">👤</span>
+          <span id="uName" class="user-name">Admin</span>
+>>>>>>> e897a4c9850108e7800024fdfabd297c4e7cbf1e
         </div>
+        <button type="button" class="btn-icone" id="btnLogout" aria-label="Sair" title="Sair">✕</button>
+      </div>
+    </aside>
 
+<<<<<<< HEAD
         <div class="linha-2">
           <div class="form-group">
             <label>Bairro / Região</label>
@@ -111,8 +160,18 @@
               <option value="OUTRO">Outro</option>
             </select>
           </div>
+=======
+    <!-- Conteúdo Principal -->
+    <div class="admin-conteudo">
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <button type="button" class="btn-toggle-menu" id="btnToggleMenu" aria-label="Abrir menu">☰</button>
+          <h1 id="tituloPagina">Quadras do Mapa</h1>
+>>>>>>> e897a4c9850108e7800024fdfabd297c4e7cbf1e
         </div>
+      </header>
 
+<<<<<<< HEAD
         <div class="linha-2">
           <div class="form-group">
             <label>Latitude</label>
@@ -175,6 +234,128 @@
       </div>
     </div>
   </div>
+=======
+      <main class="admin-main">
+        <!-- SEÇÃO 1: QUADRAS -->
+        <section id="sec-quadras">
+          <div class="admin__barra">
+            <input type="search" class="entrada" id="filtro-quadras" placeholder="Filtrar quadras por nome ou bairro...">
+            <button type="button" class="btn btn--primario" id="btnNovaQuadra">+ Nova quadra</button>
+          </div>
+          <ul class="linhas" id="lista-quadras"></ul>
+        </section>
+
+        <!-- SEÇÃO 2: SUGESTÕES -->
+        <section id="sec-sugestoes" hidden>
+          <div class="admin__barra">
+            <input type="search" class="entrada" id="filtro-sugestoes" placeholder="Filtrar sugestões...">
+          </div>
+          <ul class="linhas" id="lista-sugestoes"></ul>
+        </section>
+
+        <!-- SEÇÃO 3: PONTOS DE DOAÇÃO -->
+        <section id="sec-pontos" hidden>
+          <div class="admin__barra">
+            <input type="search" class="entrada" id="filtro-pontos" placeholder="Filtrar pontos de doação...">
+            <button type="button" class="btn btn--primario" id="btnNovoPonto">+ Novo ponto</button>
+          </div>
+          <ul class="linhas" id="lista-pontos"></ul>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal Cadastro / Edição de Quadra -->
+  <dialog class="folha" id="modalQuadra" aria-labelledby="modalTitulo">
+    <div class="folha__topo">
+      <h2 id="modalTitulo">Nova quadra</h2>
+      <button type="button" class="btn-icone btn-fechar-dialog" data-modal="modalQuadra" aria-label="Fechar">✕</button>
+    </div>
+    <form class="folha__corpo form" id="formQuadra" novalidate>
+      <input type="hidden" id="qId">
+      <div class="campo">
+        <label class="campo__rotulo" for="qNome">Nome da quadra</label>
+        <input class="entrada" id="qNome" required placeholder="Ex.: Quadra Poliesportiva 305 Sul">
+      </div>
+      <div class="campo">
+        <label class="campo__rotulo" for="qEndereco">Endereço</label>
+        <input class="entrada" id="qEndereco" required placeholder="Ex.: Alameda 9, Quadra 305 Sul">
+      </div>
+      <div class="campo">
+        <label class="campo__rotulo" for="qBairro">Quadra ou bairro</label>
+        <input class="entrada" id="qBairro" placeholder="Ex.: 305 Sul">
+      </div>
+      <div class="campo">
+        <label class="campo__rotulo" for="qDescricao">Descrição (opcional)</label>
+        <textarea class="entrada" id="qDescricao" rows="3" placeholder="Insira detalhes adicionais..."></textarea>
+      </div>
+    </form>
+    <div class="folha__rodape">
+      <button type="button" class="btn btn--claro btn-fechar-dialog" data-modal="modalQuadra">Cancelar</button>
+      <button type="submit" form="formQuadra" class="btn btn--primario" id="btnSalvar">Salvar quadra</button>
+    </div>
+  </dialog>
+
+  <!-- Modal Visualização Detalhada Unificada -->
+  <dialog class="folha" id="modalDetalheAdmin" aria-labelledby="modalDetalheTitulo">
+    <div class="folha__topo">
+      <h2 id="modalDetalheTitulo">Detalhes do Registro</h2>
+      <button type="button" class="btn-icone btn-fechar-dialog" data-modal="modalDetalheAdmin" aria-label="Fechar">✕</button>
+    </div>
+    <div class="folha__corpo" id="conteudoDetalheAdmin"></div>
+    <div class="folha__rodape">
+      <button type="button" class="btn btn--claro btn-fechar-dialog" data-modal="modalDetalheAdmin">Fechar</button>
+    </div>
+  </dialog>
+
+  <!-- Modal Analisar Sugestão -->
+  <dialog class="folha" id="modalSugestao">
+    <div class="folha__topo">
+      <h2>Analisar Sugestão</h2>
+      <button type="button" class="btn-icone btn-fechar-dialog" data-modal="modalSugestao" aria-label="Fechar">✕</button>
+    </div>
+    <div class="folha__corpo" id="detalheSugestaoConteudo"></div>
+    <div class="folha__rodape">
+      <button type="button" class="btn btn--claro btn-fechar-dialog" data-modal="modalSugestao">Cancelar</button>
+      <button type="button" class="btn btn--primario" id="btnConfirmarAprovacao">Aprovar e Publicar no Mapa</button>
+    </div>
+  </dialog>
+
+  <!-- Modal Ponto de Doação -->
+  <dialog class="folha" id="modalPonto">
+    <div class="folha__topo">
+      <h2 id="modalPontoTitulo">Novo ponto de doação</h2>
+      <button type="button" class="btn-icone btn-fechar-dialog" data-modal="modalPonto" aria-label="Fechar">✕</button>
+    </div>
+    <form class="folha__corpo form" id="formPonto" novalidate>
+      <input type="hidden" id="pId">
+      <div class="campo">
+        <label class="campo__rotulo" for="pNome">Nome do local</label>
+        <input class="entrada" id="pNome" required placeholder="Ex.: Lanchonete do Zé">
+      </div>
+      <div class="campo">
+        <label class="campo__rotulo" for="pEndereco">Endereço</label>
+        <input class="entrada" id="pEndereco" required placeholder="Ex.: Quadra 305 Sul">
+      </div>
+      <div class="campo">
+        <label class="campo__rotulo" for="pResponsavel">Responsável</label>
+        <input class="entrada" id="pResponsavel" placeholder="Ex.: Seu Zé">
+      </div>
+      <div class="campo">
+        <label class="campo__rotulo" for="pTelefone">Telefone / WhatsApp</label>
+        <input class="entrada" id="pTelefone" placeholder="(63) 99999-8888">
+      </div>
+      <div class="campo">
+        <label class="campo__rotulo" for="pHorario">Horário de Funcionamento</label>
+        <input class="entrada" id="pHorario" placeholder="Seg a Sáb das 08h às 18h">
+      </div>
+    </form>
+    <div class="folha__rodape">
+      <button type="button" class="btn btn--claro btn-fechar-dialog" data-modal="modalPonto">Cancelar</button>
+      <button type="submit" form="formPonto" class="btn btn--primario" id="btnSalvarPonto">Salvar ponto</button>
+    </div>
+  </dialog>
+>>>>>>> e897a4c9850108e7800024fdfabd297c4e7cbf1e
 
   <script type="module" src="js/pages/admin-page.js"></script>
 </body>
