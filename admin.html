@@ -4,9 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#F2F5F8">
-  <title>Equipe · TemQuadra</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <meta name="theme-color" content="#0F172A">
+  <title>Painel Admin · TemQuadra</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,600..800&family=Figtree:wght@400..700&display=swap" rel="stylesheet">
@@ -15,113 +14,171 @@
 </head>
 
 <body class="pagina-admin">
-  <header class="admin-topo">
-    <div class="admin-topo__marca">
-      <a class="marca" href="index.html" aria-label="TemQuadra, ver o mapa">
-        <span class="marca__selo" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2">
-            <rect x="6" y="2.5" width="12" height="19" rx="1.5" />
-            <path d="M6 12h12M9.5 2.5v3h5v-3M9.5 21.5v-3h5v3" />
-            <circle cx="12" cy="12" r="2.4" />
-          </svg>
-        </span>
-        TemQuadra
-      </a>
-      <span class="admin-topo__selo">Equipe</span>
-    </div>
-    <div class="admin-topo__usuario">
-      <span class="admin-topo__nome" id="uName"></span>
-      <button type="button" class="btn-icone" id="btnLogout" aria-label="Sair" title="Sair"></button>
-    </div>
-  </header>
-
-  <main class="admin">
-    <div class="admin__saudacao">
-      <h1 id="saudacao">Oi!</h1>
-      <p id="resumo" aria-live="polite">Carregando…</p>
-    </div>
-
-    <div class="abas" role="tablist" aria-label="Seções">
-      <button type="button" class="aba" role="tab" id="aba-quadras" aria-controls="sec-quadras" aria-selected="true">
-        Quadras <span class="aba__contagem" id="cont-quadras">0</span>
-      </button>
-      <button type="button" class="aba" role="tab" id="aba-sugestoes" aria-controls="sec-sugestoes" aria-selected="false" tabindex="-1">
-        Sugestões <span class="aba__contagem" id="cont-sugestoes">0</span>
-      </button>
-    </div>
-
-    <section id="sec-quadras" role="tabpanel" aria-labelledby="aba-quadras">
-      <div class="admin__barra">
-        <input type="search" class="entrada" id="filtro-quadras" placeholder="Filtrar quadras" aria-label="Filtrar quadras">
-        <button type="button" class="btn btn--primario" id="btnNovaQuadra"></button>
+  <div class="admin-wrapper">
+    <!-- Menu Lateral (Sidebar) -->
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div>
+        <div class="admin-sidebar__topo">
+          <a class="admin-sidebar__marca" href="index.html">
+            <span class="marca__selo">⚡</span>
+            TemQuadra
+          </a>
+        </div>
+        <nav class="admin-sidebar__menu">
+          <button type="button" class="admin-nav-item active" id="aba-quadras" data-tab="sec-quadras">
+            <span>🏟️ Quadras</span>
+            <span class="admin-nav-badge" id="cont-quadras">0</span>
+          </button>
+          <button type="button" class="admin-nav-item" id="aba-sugestoes" data-tab="sec-sugestoes">
+            <span>💡 Sugestões</span>
+            <span class="admin-nav-badge admin-nav-badge--alerta" id="cont-sugestoes">0</span>
+          </button>
+          <button type="button" class="admin-nav-item" id="aba-pontos" data-tab="sec-pontos">
+            <span>📍 Pontos de Doação</span>
+            <span class="admin-nav-badge" id="cont-pontos">0</span>
+          </button>
+        </nav>
       </div>
-      <ul class="linhas" id="lista-quadras" style="margin-top:14px"></ul>
-    </section>
 
-    <section id="sec-sugestoes" role="tabpanel" aria-labelledby="aba-sugestoes" hidden>
-      <div class="linhas" id="lista-sugestoes"></div>
-    </section>
-  </main>
+      <div class="admin-sidebar__rodape">
+        <div class="user-info">
+          <span class="user-avatar">👤</span>
+          <span id="uName" class="user-name">Admin</span>
+        </div>
+        <button type="button" class="btn-icone" id="btnLogout" aria-label="Sair" title="Sair">✕</button>
+      </div>
+    </aside>
 
-  <!-- Cadastro / edição de quadra -->
+    <!-- Conteúdo Principal -->
+    <div class="admin-conteudo">
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <button type="button" class="btn-toggle-menu" id="btnToggleMenu" aria-label="Abrir menu">☰</button>
+          <h1 id="tituloPagina">Quadras do Mapa</h1>
+        </div>
+      </header>
+
+      <main class="admin-main">
+        <!-- SEÇÃO 1: QUADRAS -->
+        <section id="sec-quadras">
+          <div class="admin__barra">
+            <input type="search" class="entrada" id="filtro-quadras" placeholder="Filtrar quadras por nome ou bairro...">
+            <button type="button" class="btn btn--primario" id="btnNovaQuadra">+ Nova quadra</button>
+          </div>
+          <ul class="linhas" id="lista-quadras"></ul>
+        </section>
+
+        <!-- SEÇÃO 2: SUGESTÕES -->
+        <section id="sec-sugestoes" hidden>
+          <div class="admin__barra">
+            <input type="search" class="entrada" id="filtro-sugestoes" placeholder="Filtrar sugestões...">
+          </div>
+          <ul class="linhas" id="lista-sugestoes"></ul>
+        </section>
+
+        <!-- SEÇÃO 3: PONTOS DE DOAÇÃO -->
+        <section id="sec-pontos" hidden>
+          <div class="admin__barra">
+            <input type="search" class="entrada" id="filtro-pontos" placeholder="Filtrar pontos de doação...">
+            <button type="button" class="btn btn--primario" id="btnNovoPonto">+ Novo ponto</button>
+          </div>
+          <ul class="linhas" id="lista-pontos"></ul>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal Cadastro / Edição de Quadra -->
   <dialog class="folha" id="modalQuadra" aria-labelledby="modalTitulo">
     <div class="folha__topo">
       <h2 id="modalTitulo">Nova quadra</h2>
-      <button type="button" class="btn-icone" id="btnFecharModal" aria-label="Fechar"></button>
+      <button type="button" class="btn-icone btn-fechar-dialog" data-modal="modalQuadra" aria-label="Fechar">✕</button>
     </div>
     <form class="folha__corpo form" id="formQuadra" novalidate>
       <input type="hidden" id="qId">
-
       <div class="campo">
         <label class="campo__rotulo" for="qNome">Nome da quadra</label>
-        <input class="entrada" id="qNome" required>
-        <p class="campo__erro" hidden>A quadra precisa de um nome.</p>
+        <input class="entrada" id="qNome" required placeholder="Ex.: Quadra Poliesportiva 305 Sul">
       </div>
       <div class="campo">
         <label class="campo__rotulo" for="qEndereco">Endereço</label>
-        <input class="entrada" id="qEndereco" required>
-        <p class="campo__erro" hidden>Informe o endereço.</p>
+        <input class="entrada" id="qEndereco" required placeholder="Ex.: Alameda 9, Quadra 305 Sul">
       </div>
       <div class="campo">
         <label class="campo__rotulo" for="qBairro">Quadra ou bairro</label>
         <input class="entrada" id="qBairro" placeholder="Ex.: 305 Sul">
       </div>
-
-      <fieldset>
-        <legend>Local no mapa</legend>
-        <div id="qLocal"></div>
-      </fieldset>
-
-      <fieldset>
-        <legend>Tipo de piso</legend>
-        <div class="escolhas" id="qPisos"></div>
-      </fieldset>
-      <fieldset>
-        <legend>Cobertura</legend>
-        <div class="escolhas" id="qCoberturas"></div>
-      </fieldset>
-
-      <label class="interruptor">Tem iluminação à noite<input type="checkbox" id="qIluminacao"></label>
-      <div id="qExtras" style="display:contents"></div>
-
       <div class="campo">
         <label class="campo__rotulo" for="qDescricao">Descrição (opcional)</label>
-        <textarea class="entrada" id="qDescricao"></textarea>
+        <textarea class="entrada" id="qDescricao" rows="3" placeholder="Insira detalhes adicionais..."></textarea>
       </div>
-
-      <fieldset id="divFotos">
-        <legend>Fotos (até 5)</legend>
-        <div class="fotos" id="qFotos"></div>
-      </fieldset>
-      <p class="campo__dica" id="avisoFotos" hidden>Por enquanto a API só recebe fotos no cadastro. Pra trocar as fotos, cadastre a quadra de novo.</p>
     </form>
     <div class="folha__rodape">
-      <button type="button" class="btn btn--claro" id="btnCancelar">Cancelar</button>
+      <button type="button" class="btn btn--claro btn-fechar-dialog" data-modal="modalQuadra">Cancelar</button>
       <button type="submit" form="formQuadra" class="btn btn--primario" id="btnSalvar">Salvar quadra</button>
     </div>
   </dialog>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Modal Visualização Detalhada Unificada -->
+  <dialog class="folha" id="modalDetalheAdmin" aria-labelledby="modalDetalheTitulo">
+    <div class="folha__topo">
+      <h2 id="modalDetalheTitulo">Detalhes do Registro</h2>
+      <button type="button" class="btn-icone btn-fechar-dialog" data-modal="modalDetalheAdmin" aria-label="Fechar">✕</button>
+    </div>
+    <div class="folha__corpo" id="conteudoDetalheAdmin"></div>
+    <div class="folha__rodape">
+      <button type="button" class="btn btn--claro btn-fechar-dialog" data-modal="modalDetalheAdmin">Fechar</button>
+    </div>
+  </dialog>
+
+  <!-- Modal Analisar Sugestão -->
+  <dialog class="folha" id="modalSugestao">
+    <div class="folha__topo">
+      <h2>Analisar Sugestão</h2>
+      <button type="button" class="btn-icone btn-fechar-dialog" data-modal="modalSugestao" aria-label="Fechar">✕</button>
+    </div>
+    <div class="folha__corpo" id="detalheSugestaoConteudo"></div>
+    <div class="folha__rodape">
+      <button type="button" class="btn btn--claro btn-fechar-dialog" data-modal="modalSugestao">Cancelar</button>
+      <button type="button" class="btn btn--primario" id="btnConfirmarAprovacao">Aprovar e Publicar no Mapa</button>
+    </div>
+  </dialog>
+
+  <!-- Modal Ponto de Doação -->
+  <dialog class="folha" id="modalPonto">
+    <div class="folha__topo">
+      <h2 id="modalPontoTitulo">Novo ponto de doação</h2>
+      <button type="button" class="btn-icone btn-fechar-dialog" data-modal="modalPonto" aria-label="Fechar">✕</button>
+    </div>
+    <form class="folha__corpo form" id="formPonto" novalidate>
+      <input type="hidden" id="pId">
+      <div class="campo">
+        <label class="campo__rotulo" for="pNome">Nome do local</label>
+        <input class="entrada" id="pNome" required placeholder="Ex.: Lanchonete do Zé">
+      </div>
+      <div class="campo">
+        <label class="campo__rotulo" for="pEndereco">Endereço</label>
+        <input class="entrada" id="pEndereco" required placeholder="Ex.: Quadra 305 Sul">
+      </div>
+      <div class="campo">
+        <label class="campo__rotulo" for="pResponsavel">Responsável</label>
+        <input class="entrada" id="pResponsavel" placeholder="Ex.: Seu Zé">
+      </div>
+      <div class="campo">
+        <label class="campo__rotulo" for="pTelefone">Telefone / WhatsApp</label>
+        <input class="entrada" id="pTelefone" placeholder="(63) 99999-8888">
+      </div>
+      <div class="campo">
+        <label class="campo__rotulo" for="pHorario">Horário de Funcionamento</label>
+        <input class="entrada" id="pHorario" placeholder="Seg a Sáb das 08h às 18h">
+      </div>
+    </form>
+    <div class="folha__rodape">
+      <button type="button" class="btn btn--claro btn-fechar-dialog" data-modal="modalPonto">Cancelar</button>
+      <button type="submit" form="formPonto" class="btn btn--primario" id="btnSalvarPonto">Salvar ponto</button>
+    </div>
+  </dialog>
+
   <script type="module" src="js/pages/admin-page.js"></script>
 </body>
 

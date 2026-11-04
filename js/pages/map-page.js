@@ -1,10 +1,8 @@
 // js/pages/map-page.js
-// Tela pública: mapa + gaveta com a lista, busca, filtros, "perto de mim",
-// detalhe da quadra, sugerir quadra e doar materiais.
 import { listarQuadras } from '../services/quadras.service.js';
 import { escaparHtml as esc, normalizarTexto } from '../core/utils.js';
-import { PISOS, COBERTURAS, EXTRAS, extrasDaApi, infoPiso, imagemPadrao, normalizarQuadra, distanciaKm, formatarDistancia, linkRota } from '../core/quadra.js';
-import { icone, avisar, criarGaveta, usarImagemReserva } from '../components/ui.js';
+import { PISOS, COBERTURAS, EXTRAS, extrasDaApi, infoPiso, imagemPadrao, normalizarQuadra, distanciaKm, formatarDistancia } from '../core/quadra.js';
+import { icone, avisar, criarGaveta, usarImagemReserva, ativarRolagemFiltros } from '../components/ui.js';
 import { iniciarSugerir, prepararSugerir } from '../components/sugerir.js';
 
 const CENTRO_PALMAS = [-10.2085, -48.3470];
@@ -16,9 +14,9 @@ const estado = {
     pisos: new Set(),
     coberta: false,
     iluminacao: false,
-    exigir: new Set(),    // extras marcados no filtro (banheiro, bebedouro)
+    exigir: new Set(),    // extras marcados no filtro
     extras: [],           // extras que a API já manda
-    voce: null,           // { lat, lng } quando "Perto de mim" está ligado
+    voce: null,           // { lat, lng }
     selecionada: null
 };
 
@@ -51,7 +49,6 @@ function iconePino(q, ativo) {
     });
 }
 
-/** Quadras no mesmo ponto viram um pequeno círculo de pinos, pra nenhuma ficar escondida. */
 function posicoesNoMapa(lista) {
     const grupos = new Map();
     lista.forEach(q => {
@@ -88,7 +85,7 @@ function renderPinos(lista) {
 function destacarPino(id) {
     pinos.forEach((m, pid) => {
         const q = estado.quadras.find(x => x.id === pid);
-        m.setIcon(iconePino(q, pid === id));
+        if (q) m.setIcon(iconePino(q, pid === id));
         if (pid === id) {
             m.setZIndexOffset(1000);
             const el = m.getElement();
@@ -100,7 +97,6 @@ function destacarPino(id) {
     });
 }
 
-/** Espaço que topo/gaveta/painel ocupam por cima do mapa, pra enquadrar os pinos no que sobra. */
 function folgasDoMapa() {
     const desktop = gaveta?.ehDesktop();
     const topo = $('#topo').offsetHeight;
@@ -127,7 +123,6 @@ function montarChips() {
         <label class="chip"><input type="checkbox" data-filtro="piso" value="${p}">
         <span class="chip__ponto" style="--cor:${PISOS[p].cor}"></span>${PISOS[p].nome}</label>`).join('') + `
         <span class="filtros__divisor" aria-hidden="true"></span>` +
-        // Só oferece o filtro se alguma quadra tiver aquilo; senão ele só esvaziaria a lista.
         (estado.quadras.some(q => q.cobertura !== 'DESCOBERTA') ? `
         <label class="chip"><input type="checkbox" data-filtro="coberta">${icone('teto', 'ic--p')}Coberta</label>` : '') +
         (estado.quadras.some(q => q.iluminacao) ? `
@@ -283,13 +278,14 @@ function alternarPerto() {
 }
 
 /* =========================================================
-   Painéis (detalhe, sugerir, doar) + botão voltar do celular
+   Painéis (detalhe, sugerir, doar)
    ========================================================= */
 let painelAberto = null;
 let focoAnterior = null;
 
 function abrirPainel(nome) {
     const el = $(`#painel-${nome}`);
+    if (!el) return;
     if (painelAberto && painelAberto !== nome) fecharVisual(false);
     if (painelAberto !== nome) history.pushState({ painel: nome }, '');
     focoAnterior = focoAnterior || document.activeElement;
@@ -304,9 +300,11 @@ function abrirPainel(nome) {
 function fecharVisual(devolverFoco = true) {
     if (!painelAberto) return;
     const el = $(`#painel-${painelAberto}`);
-    el.classList.remove('aberto');
-    el.inert = true;
-    el.setAttribute('aria-hidden', 'true');
+    if (el) {
+        el.classList.remove('aberto');
+        el.inert = true;
+        el.setAttribute('aria-hidden', 'true');
+    }
     $('#veu').hidden = true;
     if (painelAberto === 'detalhe') {
         estado.selecionada = null;
@@ -320,7 +318,6 @@ function fecharVisual(devolverFoco = true) {
     focoAnterior = null;
 }
 
-/** Fechar sempre passa pelo histórico, assim o "voltar" do celular e o X fazem a mesma coisa. */
 function fecharPainel() {
     if (!painelAberto) return;
     if (history.state?.painel) history.back();
@@ -330,86 +327,61 @@ function fecharPainel() {
 window.addEventListener('popstate', () => fecharVisual());
 
 /* ---------- Detalhe da quadra ---------- */
-function tagsDoDetalhe(q) {
-    const p = infoPiso(q.piso);
-    const itens = [
-        `<span class="chip__ponto" style="--cor:${p.cor}"></span>Piso de ${p.nome.toLowerCase()}`,
-        `${icone(q.cobertura === 'DESCOBERTA' ? 'sol' : 'teto')}${COBERTURAS[q.cobertura] || 'Cobertura não informada'}`,
-        q.iluminacao ? `${icone('luz')}Iluminação à noite` : null,
-        ...estado.extras.filter(k => q[k]).map(k => `${icone(EXTRAS[k].icone)}${EXTRAS[k].nome}`)
-    ];
-    return itens.filter(Boolean).map(t => `<li class="tag">${t}</li>`).join('');
-}
-
 function abrirDetalhe(id) {
-    const q = estado.quadras.find(x => x.id === id);
+    const q = estado.quadras.find(item => item.id === id);
     if (!q) return;
+
     estado.selecionada = id;
     destacarPino(id);
-    document.querySelectorAll('.item').forEach(i => i.classList.toggle('selecionado', i.dataset.quadra === id));
+    if (q.lat != null) mapa.panTo([q.lat, q.lng]);
 
-    const fotos = q.fotos.length ? q.fotos : [q.capa];
+    const painel = $('#painel-detalhe');
+    const linkGoogleMaps = `https://www.google.com/maps/dir/?api=1&destination=${q.lat},${q.lng}`;
 
-    const el = $('#painel-detalhe');
-    el.innerHTML = `
-        <div class="detalhe__flutuantes">
+    const listaRecursos = [
+        { chave: 'iluminacao', nome: 'Iluminação', presente: Boolean(q.iluminacao), iconeOk: '💡', iconeFalta: '🚫' },
+        { chave: 'acessibilidade', nome: 'Acessibilidade', presente: Boolean(q.acessibilidade), iconeOk: '♿', iconeFalta: '⚠️' },
+        { chave: 'banheiro', nome: 'Banheiro', presente: Boolean(q.banheiro), iconeOk: '🚻', iconeFalta: '🚫' },
+        { chave: 'bebedouro', nome: 'Bebedouro', presente: Boolean(q.bebedouro), iconeOk: '🚰', iconeFalta: '🚫' }
+    ];
+
+    painel.innerHTML = `
+        <div class="painel__topo">
+            <h2>${esc(q.nome)}</h2>
             <button type="button" class="btn-icone" data-fechar aria-label="Fechar">${icone('fechar')}</button>
-            <button type="button" class="btn-icone" id="btn-compartilhar" aria-label="Compartilhar quadra">${icone('compartilhar')}</button>
         </div>
-        <div class="detalhe__rolagem">
-            <div class="detalhe__galeria" id="galeria">
-                ${fotos.map((f, i) => `<img src="${esc(f)}" data-reserva="${imagemPadrao(q.piso)}" alt="${i === 0 ? `Foto da ${esc(q.nome)}` : ''}" ${i ? 'loading="lazy"' : ''}>`).join('')}
+        <div class="detalhe__galeria">
+            <img src="${esc(q.capa)}" data-reserva="${imagemPadrao(q.piso)}" alt="${esc(q.nome)}">
+        </div>
+        <div class="detalhe__corpo">
+            <div class="detalhe__tags">
+                <span class="tag">PISO: ${q.piso.toUpperCase()}</span>
+                <span class="tag">COBERTURA: ${q.cobertura.toUpperCase()}</span>
             </div>
-            ${fotos.length > 1 ? `<div class="detalhe__pontos" aria-hidden="true">${fotos.map((_, i) => `<span class="${i ? '' : 'ativo'}"></span>`).join('')}</div>` : ''}
-            <div class="detalhe__corpo">
-                <div>
-                    ${q.bairro ? `<p class="detalhe__bairro">${esc(q.bairro)}${q.distanciaKm != null ? `, a ${formatarDistancia(q.distanciaKm)} de você` : ''}</p>` : ''}
-                    <h2 class="detalhe__nome">${esc(q.nome)}</h2>
-                </div>
-                ${q.endereco ? `<p class="detalhe__endereco">${icone('pino')}<span>${esc(q.endereco)}</span></p>` : ''}
 
-                <ul class="detalhe__tags" aria-label="Como é a quadra">${tagsDoDetalhe(q)}</ul>
-
-                ${q.descricao ? `<p class="detalhe__descricao">${esc(q.descricao)}</p>` : ''}
+            <h3 style="font-size: 15px; font-weight: 700; color: var(--tinta-2); margin-top: 8px;">Estrutura e Recursos</h3>
+            
+            <div class="detalhe__recursos">
+                ${listaRecursos.map(r => `
+                    <div class="recurso-card ${r.presente ? 'recurso-card--ok' : 'recurso-card--falta'}">
+                        <span class="recurso-card__icone">${r.presente ? r.iconeOk : r.iconeFalta}</span>
+                        <div class="recurso-card__info">
+                            <span class="recurso-card__label">${r.nome}</span>
+                            <span class="recurso-card__status">${r.presente ? 'Possui' : 'Faltando'}</span>
+                        </div>
+                    </div>
+                `).join('')}
             </div>
         </div>
+
         <div class="painel__rodape">
-            ${q.lat != null
-                ? `<a class="btn btn--primario" href="${esc(linkRota(q))}" target="_blank" rel="noopener">${icone('rota')}Como chegar</a>`
-                : `<span class="campo__dica">Essa quadra ainda não tem localização no mapa.</span>`}
-        </div>`;
+            <a class="btn btn--primario" href="${linkGoogleMaps}" target="_blank" rel="noopener">
+                📍 Como Chegar (Google Maps)
+            </a>
+        </div>
+    `;
 
-    const galeria = el.querySelector('#galeria');
-    const pontos = el.querySelectorAll('.detalhe__pontos span');
-    if (pontos.length) {
-        galeria.addEventListener('scroll', () => {
-            const i = Math.round(galeria.scrollLeft / galeria.clientWidth);
-            pontos.forEach((s, j) => s.classList.toggle('ativo', i === j));
-        }, { passive: true });
-    }
-    el.querySelector('#btn-compartilhar').addEventListener('click', () => compartilhar(q));
-
-    const url = new URL(location.href);
-    url.searchParams.set('quadra', id);
     abrirPainel('detalhe');
-    history.replaceState(history.state, '', url);
-
-    if (q.lat != null) {
-        if (gaveta.ehDesktop()) mapa.flyTo([q.lat, q.lng], Math.max(mapa.getZoom(), 15), { duration: .6 });
-        else mapa.setView([q.lat, q.lng], Math.max(mapa.getZoom(), 15));
-    }
-}
-
-async function compartilhar(q) {
-    const url = new URL(location.pathname, location.origin);
-    url.searchParams.set('quadra', q.id);
-    const dados = { title: q.nome, text: `Bora jogar na ${q.nome}?`, url: url.href };
-    try {
-        if (navigator.share) await navigator.share(dados);
-        else { await navigator.clipboard.writeText(url.href); avisar('Link copiado'); }
-    } catch (err) {
-        if (err.name !== 'AbortError') avisar('Não deu pra compartilhar.', { tipo: 'erro' });
-    }
 }
 
 /* ---------- Doar ---------- */
@@ -462,7 +434,6 @@ async function carregar() {
         const pedida = new URLSearchParams(location.search).get('quadra');
         if (pedida && estado.quadras.some(q => q.id === pedida)) abrirDetalhe(pedida);
         else if (pedida) {
-            // Link de uma quadra que saiu do mapa (ou id errado)
             avisar('Essa quadra não está mais no mapa.', { tipo: 'erro' });
             history.replaceState(null, '', location.pathname);
         }
@@ -547,6 +518,7 @@ function iniciarGaveta() {
 
 document.addEventListener('DOMContentLoaded', () => {
     usarImagemReserva();
+    ativarRolagemFiltros();
     ligarEventos();
     iniciarMapa();
     iniciarGaveta();

@@ -192,3 +192,34 @@ export function criarGaveta(el, { alca, corpo, topoLivre = () => 0, espiar = () 
         ehDesktop: () => DESKTOP.matches
     };
 }
+export function ativarRolagemFiltros() {
+  const container = document.getElementById('filtros');
+  if (!container) return;
+
+  let isDown = false;
+  let startX = 0;
+  let scrollLeft = 0;
+  let arrastou = false;
+
+  container.addEventListener('mousedown', (e) => {
+    // Se clicar em um input/label/chip, não trava a interação padrão
+    if (e.target.closest('input, label, .chip')) return;
+
+    isDown = true;
+    arrastou = false;
+    startX = e.pageX - container.offsetLeft;
+    scrollLeft = container.scrollLeft;
+  });
+
+  container.addEventListener('mouseleave', () => { isDown = false; });
+  container.addEventListener('mouseup', () => { isDown = false; });
+
+  container.addEventListener('mousemove', (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - container.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    if (Math.abs(walk) > 5) arrastou = true;
+    container.scrollLeft = scrollLeft - walk;
+  });
+}

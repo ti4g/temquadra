@@ -1,0 +1,26 @@
+
+/* ---------- Login ---------- */
+.pagina-login {
+  min-height: 100dvh;
+  display: grid; place-items: center;
+  padding: 24px 16px calc(24px + env(safe-area-inset-bottom));
+  background: #1478C4;
+  overflow-x: hidden;
+}
+.login__quadra { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.login { position: relative; width: min(420px, 100%); display: grid; gap: 22px; justify-items: center; }
+.marca--clara { color: var(--branco); font-size: 22px; }
+.marca--clara .marca__selo { background: var(--tinta); }
+.login__cartao {
+  width: 100%; padding: 28px 22px;
+  border-radius: var(--raio-gaveta); background: var(--branco);
+  box-shadow: var(--sombra-2);
+}
+.login__cartao h1 { font-size: 30px; font-variation-settings: "wdth" 88; letter-spacing: -.035em; }
+.login__sub { margin: 6px 0 22px; color: var(--tinta-2); }
+.login__erro {
+  padding: 12px 14px; border-radius: 12px;
+  background: #FDECEA; color: var(--perigo); font-weight: 600; font-size: 14px;
+}
+.login__voltar { color: var(--branco); font-weight: 650; text-decoration: none; padding: 8px; }
+.login__voltar:hover { text-decoration: underline; }
