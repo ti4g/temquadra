@@ -8,7 +8,9 @@
   <title>Painel Admin · TemQuadra</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,600..800&family=Figtree:wght@400..700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,600..800&family=Figtree:wght@400..700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/painel.css">
 </head>
@@ -62,7 +64,8 @@
         <!-- SEÇÃO 1: QUADRAS -->
         <section id="sec-quadras">
           <div class="admin__barra">
-            <input type="search" class="entrada" id="filtro-quadras" placeholder="Filtrar quadras por nome ou bairro...">
+            <input type="search" class="entrada" id="filtro-quadras"
+              placeholder="Filtrar quadras por nome ou bairro...">
             <button type="button" class="btn btn--primario" id="btnNovaQuadra">+ Nova quadra</button>
           </div>
           <ul class="linhas" id="lista-quadras"></ul>
@@ -96,21 +99,88 @@
     </div>
     <form class="folha__corpo form" id="formQuadra" novalidate>
       <input type="hidden" id="qId">
+
       <div class="campo">
         <label class="campo__rotulo" for="qNome">Nome da quadra</label>
         <input class="entrada" id="qNome" required placeholder="Ex.: Quadra Poliesportiva 305 Sul">
       </div>
+
+      <div class="linha-2">
+        <div class="campo">
+          <label class="campo__rotulo" for="qCep">CEP</label>
+          <input class="entrada" id="qCep" maxlength="9" placeholder="77000-000">
+        </div>
+        <div class="campo">
+          <label class="campo__rotulo" for="qBairro">Quadra ou Bairro</label>
+          <input class="entrada" id="qBairro" placeholder="Ex.: 305 Sul">
+        </div>
+      </div>
+
       <div class="campo">
-        <label class="campo__rotulo" for="qEndereco">Endereço</label>
+        <label class="campo__rotulo" for="qEndereco">Endereço Completo</label>
         <input class="entrada" id="qEndereco" required placeholder="Ex.: Alameda 9, Quadra 305 Sul">
       </div>
-      <div class="campo">
-        <label class="campo__rotulo" for="qBairro">Quadra ou bairro</label>
-        <input class="entrada" id="qBairro" placeholder="Ex.: 305 Sul">
+
+      <div class="linha-2">
+        <div class="campo">
+          <label class="campo__rotulo" for="qLatitude">Latitude</label>
+          <input class="entrada" type="number" step="any" id="qLatitude" placeholder="Ex.: -10.1834">
+        </div>
+        <div class="campo">
+          <label class="campo__rotulo" for="qLongitude">Longitude</label>
+          <input class="entrada" type="number" step="any" id="qLongitude" placeholder="Ex.: -48.3336">
+        </div>
       </div>
+
+      <div class="linha-2">
+        <div class="campo">
+          <label class="campo__rotulo" for="qPiso">Tipo de Piso</label>
+          <select class="entrada" id="qPiso">
+            <option value="CIMENTO">Cimento</option>
+            <option value="EMBORRACHADO">Emborrachado</option>
+            <option value="AREIA">Areia</option>
+            <option value="GRAMADO">Gramado</option>
+            <option value="GRAMA_SINTETICA">Grama Sintética</option>
+            <option value="OUTRO">Outro</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label class="campo__rotulo" for="qCobertura">Cobertura</label>
+          <select class="entrada" id="qCobertura">
+            <option value="DESCOBERTA">Descoberta</option>
+            <option value="COBERTA">Coberta</option>
+            <option value="PARCIALMENTE_COBERTA">Parcialmente Coberta</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grupo-interruptores">
+        <label class="interruptor">
+          <span>💡 Iluminação Noturna</span>
+          <input type="checkbox" id="qIluminacao">
+        </label>
+        <label class="interruptor">
+          <span>♿ Acessibilidade (Rampa)</span>
+          <input type="checkbox" id="qAcessibilidade">
+        </label>
+        <label class="interruptor">
+          <span>🚻 Banheiro Público</span>
+          <input type="checkbox" id="qBanheiro">
+        </label>
+        <label class="interruptor">
+          <span>🚰 Bebedouro</span>
+          <input type="checkbox" id="qBebedouro">
+        </label>
+      </div>
+
       <div class="campo">
         <label class="campo__rotulo" for="qDescricao">Descrição (opcional)</label>
         <textarea class="entrada" id="qDescricao" rows="3" placeholder="Insira detalhes adicionais..."></textarea>
+      </div>
+
+      <div class="campo" id="divFotos">
+        <label class="campo__rotulo" for="qFotos">Fotos da Quadra (MinIO)</label>
+        <input class="entrada" type="file" id="qFotos" multiple accept="image/*">
       </div>
     </form>
     <div class="folha__rodape">
@@ -123,8 +193,15 @@
   <dialog class="folha" id="modalDetalheAdmin" aria-labelledby="modalDetalheTitulo">
     <div class="folha__topo">
       <h2 id="modalDetalheTitulo">Detalhes do Registro</h2>
-      <button type="button" class="btn-icone btn-fechar-dialog" data-modal="modalDetalheAdmin" aria-label="Fechar">✕</button>
+      <button type="button" class="btn-icone btn-fechar-dialog" data-modal="modalDetalheAdmin"
+        aria-label="Fechar">✕</button>
     </div>
+
+    <!-- ÁREA DA FOTO (Melhoria visual: aparecerá a foto de forma de destaque) -->
+    <div class="visualizacao-midia" id="modalDetalheMidia">
+     <img id="modalDetalheFoto" src="" alt="Foto do registro">
+    </div>
+
     <div class="folha__corpo" id="conteudoDetalheAdmin"></div>
     <div class="folha__rodape">
       <button type="button" class="btn btn--claro btn-fechar-dialog" data-modal="modalDetalheAdmin">Fechar</button>
@@ -135,14 +212,22 @@
   <dialog class="folha" id="modalSugestao">
     <div class="folha__topo">
       <h2>Analisar Sugestão</h2>
-      <button type="button" class="btn-icone btn-fechar-dialog" data-modal="modalSugestao" aria-label="Fechar">✕</button>
+      <button type="button" class="btn-icone btn-fechar-dialog" data-modal="modalSugestao"
+        aria-label="Fechar">✕</button>
     </div>
+
+    <!-- Melhoria visual de foto para sugestões de quadras -->
+    <div class="visualizacao-midia" id="modalSugestaoMidia">
+      <img id="modalSugestaoFoto" src="" alt="Foto da sugestão">
+    </div>
+
     <div class="folha__corpo" id="detalheSugestaoConteudo"></div>
     <div class="folha__rodape">
       <button type="button" class="btn btn--claro btn-fechar-dialog" data-modal="modalSugestao">Cancelar</button>
       <button type="button" class="btn btn--primario" id="btnConfirmarAprovacao">Aprovar e Publicar no Mapa</button>
     </div>
   </dialog>
+
 
   <!-- Modal Ponto de Doação -->
   <dialog class="folha" id="modalPonto">
@@ -162,7 +247,10 @@
       </div>
       <div class="campo">
         <label class="campo__rotulo" for="pResponsavel">Responsável</label>
-        <input class="entrada" id="pResponsavel" placeholder="Ex.: Seu Zé">
+        <!-- Mudança: Dropdown dinâmico -->
+        <select class="entrada" id="pResponsavel" required>
+          <option value="">Selecione um responsável...</option>
+        </select>
       </div>
       <div class="campo">
         <label class="campo__rotulo" for="pTelefone">Telefone / WhatsApp</label>
@@ -171,6 +259,11 @@
       <div class="campo">
         <label class="campo__rotulo" for="pHorario">Horário de Funcionamento</label>
         <input class="entrada" id="pHorario" placeholder="Seg a Sáb das 08h às 18h">
+      </div>
+      <!-- Mudança: campo de upload de imagens para ponto_coleta -->
+      <div class="campo">
+        <label class="campo__rotulo">Fotos do Ponto de Doação (Upload)</label>
+        <input class="entrada" type="file" id="pFotos" multiple accept="image/*">
       </div>
     </form>
     <div class="folha__rodape">

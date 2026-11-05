@@ -7,24 +7,23 @@ export async function listarPontosColetaAdmin() {
     return httpClient('/pontos-coleta');
 }
 
-
 /**
  * Cadastra um novo ponto de coleta
  */
-export async function cadastrarPontoColeta(dados) {
+export async function cadastrarPontoColeta(formData) {
     return httpClient('/pontos-coleta', {
         method: 'POST',
-        body: JSON.stringify(dados)
+        body: formData //aceita fotos
     });
 }
 
 /**
  * Atualiza um ponto de coleta existente
  */
-export async function atualizarPontoColeta(idPonto, dados) {
+export async function atualizarPontoColeta(idPonto, formData) {
     return httpClient(`/pontos-coleta/${idPonto}`, {
-        method: 'PUT',
-        body: JSON.stringify(dados)
+        method: 'PUT', // multipart mapping
+        body: formData // Alterado de JSON para FormData para suportar fotos
     });
 }
 

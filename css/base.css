@@ -30,9 +30,13 @@
 
   --fonte-titulo: 'Bricolage Grotesque', system-ui, sans-serif;
   --fonte-corpo: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Space Mono', monospace;
 
   --mola: cubic-bezier(.22, 1.2, .36, 1);
   --suave: cubic-bezier(.2, .8, .2, 1);
+
+    
+ 
 }
 
 *, *::before, *::after { box-sizing: border-box; }

@@ -28,21 +28,17 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Configuração do Usuário
     const uName = document.getElementById('uName');
     if (uName) uName.textContent = localStorage.getItem('userName') || 'Admin';
     document.getElementById('btnLogout')?.addEventListener('click', logout);
 
-    // Menu Responsivo Mobile
     const sidebar = document.getElementById('adminSidebar');
     document.getElementById('btnToggleMenu')?.addEventListener('click', () => {
         sidebar?.classList.toggle('aberta');
     });
 
-    // Navegação por Sidebar
     configurarMenuSidebar();
 
-    // Eventos Universais para Fechamento de Modais (<dialog>)
     document.querySelectorAll('.btn-fechar-dialog').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const modalId = e.currentTarget.dataset.modal;
@@ -50,29 +46,57 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Carregamento Inicial
     carregarQuadras();
     carregarPontos();
     carregarSugestoes();
 
-    // Eventos de Quadras
+    document.getElementById('qCep')?.addEventListener('blur', buscarEnderecoPorCep);
+    document.getElementById('qCep')?.addEventListener('input', formatarMascaraCep);
+
     document.getElementById('btnNovaQuadra')?.addEventListener('click', () => abrirModalQuadra());
     document.getElementById('formQuadra')?.addEventListener('submit', handleSalvarQuadra);
     document.getElementById('filtro-quadras')?.addEventListener('input', (e) => filtrarQuadras(e.target.value));
 
-    // Eventos de Pontos de Doação
     document.getElementById('btnNovoPonto')?.addEventListener('click', () => abrirModalPonto());
     document.getElementById('formPonto')?.addEventListener('submit', handleSalvarPonto);
     document.getElementById('filtro-pontos')?.addEventListener('input', (e) => filtrarPontos(e.target.value));
 
-    // Eventos de Sugestões
     document.getElementById('btnConfirmarAprovacao')?.addEventListener('click', handleAprovarSugestao);
     document.getElementById('filtro-sugestoes')?.addEventListener('input', (e) => filtrarSugestoes(e.target.value));
 });
 
-/* =========================================================
-   CONTROLE DE MODAIS NATIVOS (<dialog>)
-   ========================================================= */
+function formatarMascaraCep(e) {
+    let v = e.target.value.replace(/\D/g, '');
+    if (v.length > 5) {
+        v = v.substring(0, 5) + '-' + v.substring(5, 8);
+    }
+    e.target.value = v;
+}
+
+async function buscarEnderecoPorCep(e) {
+    const cep = e.target.value.replace(/\D/g, '');
+    if (cep.length !== 8) return;
+
+    try {
+        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const dados = await response.json();
+
+        if (dados.erro) {
+            alert('CEP não encontrado.');
+            return;
+        }
+
+        if (dados.logradouro) {
+            document.getElementById('qEndereco').value = `${dados.logradouro}, ${dados.bairro || ''}`.trim();
+        }
+        if (dados.bairro) {
+            document.getElementById('qBairro').value = dados.bairro;
+        }
+    } catch (err) {
+        console.error('Erro ao consultar CEP:', err);
+    }
+}
+
 function abrirModalDialog(dialogEl) {
     if (!dialogEl) return;
     if (typeof dialogEl.showModal === 'function') {
@@ -91,9 +115,6 @@ function fecharModal(dialogEl) {
     }
 }
 
-/* =========================================================
-   MENU LATERAL (SIDEBAR)
-   ========================================================= */
 function configurarMenuSidebar() {
     const botoes = document.querySelectorAll('.admin-nav-item');
     const secQuadras = document.getElementById('sec-quadras');
@@ -126,9 +147,7 @@ function configurarMenuSidebar() {
     });
 }
 
-/* =========================================================
-   GERENCIAMENTO DE QUADRAS
-   ========================================================= */
+/* GERENCIAMENTO DE QUADRAS */
 async function carregarQuadras() {
     const listaEl = document.getElementById('lista-quadras');
     const contEl = document.getElementById('cont-quadras');
@@ -154,9 +173,9 @@ function renderizarQuadras(lista) {
     }
 
     lista.forEach(q => {
-        const fotoUrl = (q.fotos && q.fotos.length > 0) 
-            ? (q.fotos[0].urlMinio || q.fotos[0]) 
-            : 'https://via.placeholder.com/100x80?text=Sem+Foto';
+        const fotoUrl = (q.imagens && q.imagens.length > 0) 
+            ? (q.imagens[0].urlMinio || q.imagens[0]) 
+            : (q.fotos && q.fotos.length > 0 ? (q.fotos[0].urlMinio || q.fotos[0]) : 'https://via.placeholder.com/100x80?text=Sem+Foto');
 
         const li = document.createElement('li');
         li.className = 'linha';
@@ -200,6 +219,20 @@ function abrirModalQuadra(quadra = null) {
     document.getElementById('qBairro').value = quadra ? (quadra.bairroRegiao || '') : '';
     document.getElementById('qDescricao').value = quadra ? (quadra.descricao || '') : '';
 
+    document.getElementById('qPiso').value = quadra ? (quadra.tipoPiso || 'CIMENTO') : 'CIMENTO';
+    document.getElementById('qCobertura').value = quadra ? (quadra.cobertura || 'DESCOBERTA') : 'DESCOBERTA';
+
+    document.getElementById('qLatitude').value = (quadra && quadra.latitude != null) ? quadra.latitude : '';
+    document.getElementById('qLongitude').value = (quadra && quadra.longitude != null) ? quadra.longitude : '';
+
+    document.getElementById('qIluminacao').checked = quadra ? (quadra.iluminacao ?? false) : false;
+    document.getElementById('qAcessibilidade').checked = quadra ? (quadra.acessibilidade ?? false) : false;
+    document.getElementById('qBanheiro').checked = quadra ? (quadra.banheiro ?? false) : false;
+    document.getElementById('qBebedouro').checked = quadra ? (quadra.bebedouro ?? false) : false;
+
+    const divFotos = document.getElementById('divFotos');
+    if (divFotos) divFotos.style.display = quadra ? 'none' : 'block';
+
     const modalTitulo = document.getElementById('modalTitulo');
     if (modalTitulo) modalTitulo.textContent = quadra ? 'Editar quadra' : 'Nova quadra';
 
@@ -220,26 +253,38 @@ async function handleSalvarQuadra(e) {
     const id = document.getElementById('qId').value;
     const modal = document.getElementById('modalQuadra');
 
+    const latRaw = document.getElementById('qLatitude').value;
+    const lngRaw = document.getElementById('qLongitude').value;
+
+    const dadosQuadra = {
+        nome: document.getElementById('qNome').value,
+        endereco: document.getElementById('qEndereco').value,
+        bairroRegiao: document.getElementById('qBairro').value,
+        descricao: document.getElementById('qDescricao').value,
+        tipoPiso: document.getElementById('qPiso').value,
+        cobertura: document.getElementById('qCobertura').value,
+        latitude: latRaw !== '' ? parseFloat(latRaw) : null,
+        longitude: lngRaw !== '' ? parseFloat(lngRaw) : null,
+        iluminacao: document.getElementById('qIluminacao').checked,
+        acessibilidade: document.getElementById('qAcessibilidade').checked,
+        banheiro: document.getElementById('qBanheiro').checked,
+        bebedouro: document.getElementById('qBebedouro').checked
+    };
+
     try {
         if (id) {
-            const payload = {
-                nome: document.getElementById('qNome').value,
-                endereco: document.getElementById('qEndereco').value,
-                bairroRegiao: document.getElementById('qBairro').value,
-                descricao: document.getElementById('qDescricao').value,
-                ativa: true
-            };
-            await atualizarQuadra(id, payload);
+            await atualizarQuadra(id, { ...dadosQuadra, ativa: true });
         } else {
             const formData = new FormData();
-            const dados = {
-                nome: document.getElementById('qNome').value,
-                endereco: document.getElementById('qEndereco').value,
-                bairroRegiao: document.getElementById('qBairro').value,
-                descricao: document.getElementById('qDescricao').value
-            };
+            formData.append('dados', new Blob([JSON.stringify(dadosQuadra)], { type: 'application/json' }));
 
-            formData.append('dados', new Blob([JSON.stringify(dados)], { type: 'application/json' }));
+            const inputFotos = document.getElementById('qFotos');
+            if (inputFotos && inputFotos.files) {
+                for (let i = 0; i < inputFotos.files.length; i++) {
+                    formData.append('fotos', inputFotos.files[i]);
+                }
+            }
+
             await cadastrarQuadra(formData);
         }
 
@@ -264,35 +309,72 @@ async function handleExcluirQuadra(id) {
 function exibirDetalhesQuadra(q) {
     const modal = document.getElementById('modalDetalheAdmin');
     const conteudo = document.getElementById('conteudoDetalheAdmin');
-    document.getElementById('modalDetalheTitulo').textContent = `Quadra: ${q.nome}`;
+    const divMidia = document.getElementById('modalDetalheMidia');
+    const imgFoto = document.getElementById('modalDetalheFoto');
 
-    conteudo.innerHTML = `
-        <div class="grid-detalhes">
-            <div class="card-detalhe-item">
-                <span class="card-detalhe-item__rotulo">Nome</span>
-                <span class="card-detalhe-item__valor">${q.nome}</span>
+    const tituloEl = document.getElementById('modalDetalheTitulo');
+    if (tituloEl) tituloEl.textContent = `Quadra: ${q.nome}`;
+
+    // Obtendo a foto de forma segura
+    const fotoUrl = (q.imagens && q.imagens.length > 0) 
+        ? (q.imagens[0].urlMinio || q.imagens[0]) 
+        : (q.fotos && q.fotos.length > 0 ? (q.fotos[0].urlMinio || q.fotos[0]) : '');
+
+    if (divMidia && imgFoto) {
+        if (fotoUrl) {
+            imgFoto.src = fotoUrl;
+            imgFoto.style.display = 'block';
+            divMidia.classList.remove('visualizacao-midia--fallback');
+            modal?.classList.remove('dialog-sem-imagem');
+        } else {
+            imgFoto.style.display = 'none';
+            divMidia.innerHTML = '<span style="font-size: 32px;">🏟️</span>';
+            divMidia.classList.add('visualizacao-midia--fallback');
+            modal?.classList.remove('dialog-sem-imagem');
+        }
+    }
+
+    if (conteudo) {
+        conteudo.innerHTML = `
+            <div class="grid-detalhes">
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">Nome</span>
+                    <span class="card-detalhe-item__valor">${q.nome}</span>
+                </div>
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">Bairro / Região</span>
+                    <span class="card-detalhe-item__valor">${q.bairroRegiao || 'Não informado'}</span>
+                </div>
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">Endereço</span>
+                    <span class="card-detalhe-item__valor">${q.endereco || '-'}</span>
+                </div>
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">Piso / Cobertura</span>
+                    <span class="card-detalhe-item__valor">${q.tipoPiso || '-'} (${q.cobertura || '-'})</span>
+                </div>
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">Recursos Presentes</span>
+                    <span class="card-detalhe-item__valor">
+                        ${q.iluminacao ? '💡 IluminaçãoNoturna | ' : ''}
+                        ${q.acessibilidade ? '♿ Acessibilidade | ' : ''}
+                        ${q.banheiro ? '🚻 Banheiro | ' : ''}
+                        ${q.bebedouro ? '🚰 Bebedouro' : ''}
+                        ${(!q.iluminacao && !q.acessibilidade && !q.banheiro && !q.bebedouro) ? 'Nenhum recurso cadastrado' : ''}
+                    </span>
+                </div>
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">Descrição</span>
+                    <span class="card-detalhe-item__valor">${q.descricao || 'Sem descrição cadastrada'}</span>
+                </div>
             </div>
-            <div class="card-detalhe-item">
-                <span class="card-detalhe-item__rotulo">Bairro/Região</span>
-                <span class="card-detalhe-item__valor">${q.bairroRegiao || 'Não informado'}</span>
-            </div>
-            <div class="card-detalhe-item">
-                <span class="card-detalhe-item__rotulo">Endereço</span>
-                <span class="card-detalhe-item__valor">${q.endereco || '-'}</span>
-            </div>
-            <div class="card-detalhe-item">
-                <span class="card-detalhe-item__rotulo">Descrição</span>
-                <span class="card-detalhe-item__valor">${q.descricao || 'Sem descrição cadastrada'}</span>
-            </div>
-        </div>
-    `;
+        `;
+    }
 
     abrirModalDialog(modal);
 }
 
-/* =========================================================
-   GERENCIAMENTO DE SUGESTÕES
-   ========================================================= */
+/* GERENCIAMENTO DE SUGESTÕES */
 async function carregarSugestoes() {
     const listaEl = document.getElementById('lista-sugestoes');
     const contEl = document.getElementById('cont-sugestoes');
@@ -319,9 +401,9 @@ function renderizarSugestoes(lista) {
     }
 
     lista.forEach(s => {
-        const fotoUrl = (s.fotos && s.fotos.length > 0)
-            ? (s.fotos[0].urlMinio || s.fotos[0])
-            : 'https://via.placeholder.com/100x80?text=Sem+Foto';
+        const fotoUrl = (s.imagens && s.imagens.length > 0)
+            ? (s.imagens[0].urlMinio || s.imagens[0])
+            : (s.fotos && s.fotos.length > 0 ? (s.fotos[0].urlMinio || s.fotos[0]) : 'https://via.placeholder.com/100x80?text=Sem+Foto');
 
         const ehPendente = s.status === 'PENDENTE';
 
@@ -364,28 +446,40 @@ function abrirModalSugestao(sugestao) {
     sugestaoSelecionadaId = sugestao.idSugestaoQuadra || sugestao.id;
     const modal = document.getElementById('modalSugestao');
     const conteudo = document.getElementById('detalheSugestaoConteudo');
+    const imgFoto = document.getElementById('modalSugestaoFoto');
 
-    const fotoUrl = (sugestao.fotos && sugestao.fotos.length > 0)
-        ? (sugestao.fotos[0].urlMinio || sugestao.fotos[0])
-        : 'https://via.placeholder.com/500x200?text=Sem+Foto';
+    const fotoUrl = (sugestao.imagens && sugestao.imagens.length > 0)
+        ? (sugestao.imagens[0].urlMinio || sugestao.imagens[0])
+        : (sugestao.fotos && sugestao.fotos.length > 0 ? (sugestao.fotos[0].urlMinio || sugestao.fotos[0]) : '');
 
-    conteudo.innerHTML = `
-        <img src="${fotoUrl}" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 12px;">
-        <div class="grid-detalhes" style="margin-top: 12px;">
-            <div class="card-detalhe-item">
-                <span class="card-detalhe-item__rotulo">Nome</span>
-                <span class="card-detalhe-item__valor">${sugestao.nome}</span>
+    if (imgFoto) {
+        if (fotoUrl) {
+            imgFoto.src = fotoUrl;
+            imgFoto.style.display = 'block';
+        } else {
+            imgFoto.src = 'https://via.placeholder.com/500x200?text=Sem+Foto';
+            imgFoto.style.display = 'block';
+        }
+    }
+
+    if (conteudo) {
+        conteudo.innerHTML = `
+            <div class="grid-detalhes" style="margin-top: 12px;">
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">Nome</span>
+                    <span class="card-detalhe-item__valor">${sugestao.nome}</span>
+                </div>
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">Solicitante</span>
+                    <span class="card-detalhe-item__valor">${sugestao.nomeSolicitante || 'Anônimo'} (${sugestao.telefoneSolicitante || '-'})</span>
+                </div>
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">Endereço</span>
+                    <span class="card-detalhe-item__valor">${sugestao.endereco}</span>
+                </div>
             </div>
-            <div class="card-detalhe-item">
-                <span class="card-detalhe-item__rotulo">Solicitante</span>
-                <span class="card-detalhe-item__valor">${sugestao.nomeSolicitante || 'Anônimo'} (${sugestao.telefoneSolicitante || '-'})</span>
-            </div>
-            <div class="card-detalhe-item">
-                <span class="card-detalhe-item__rotulo">Endereço</span>
-                <span class="card-detalhe-item__valor">${sugestao.endereco}</span>
-            </div>
-        </div>
-    `;
+        `;
+    }
 
     abrirModalDialog(modal);
 }
@@ -408,39 +502,61 @@ async function handleAprovarSugestao() {
 function exibirDetalhesSugestao(s) {
     const modal = document.getElementById('modalDetalheAdmin');
     const conteudo = document.getElementById('conteudoDetalheAdmin');
-    document.getElementById('modalDetalheTitulo').textContent = `Sugestão: ${s.nome}`;
+    const divMidia = document.getElementById('modalDetalheMidia');
+    const imgFoto = document.getElementById('modalDetalheFoto');
+    const tituloEl = document.getElementById('modalDetalheTitulo');
 
-    conteudo.innerHTML = `
-        <div class="grid-detalhes">
-            <div class="card-detalhe-item">
-                <span class="card-detalhe-item__rotulo">Status</span>
-                <span class="card-detalhe-item__valor"><span class="status status--${s.status}">${s.status}</span></span>
+    if (tituloEl) tituloEl.textContent = `Sugestão: ${s.nome}`;
+
+    const fotoUrl = (s.imagens && s.imagens.length > 0)
+        ? (s.imagens[0].urlMinio || s.imagens[0])
+        : (s.fotos && s.fotos.length > 0 ? (s.fotos[0].urlMinio || s.fotos[0]) : '');
+
+    if (divMidia && imgFoto) {
+        if (fotoUrl) {
+            imgFoto.src = fotoUrl;
+            imgFoto.style.display = 'block';
+            divMidia.classList.remove('visualizacao-midia--fallback');
+            modal?.classList.remove('dialog-sem-imagem');
+        } else {
+            imgFoto.style.display = 'none';
+            divMidia.innerHTML = '<span style="font-size: 32px;">💡</span>';
+            divMidia.classList.add('visualizacao-midia--fallback');
+            modal?.classList.remove('dialog-sem-imagem');
+        }
+    }
+
+    if (conteudo) {
+        conteudo.innerHTML = `
+            <div class="grid-detalhes">
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">Status</span>
+                    <span class="card-detalhe-item__valor"><span class="status status--${s.status}">${s.status}</span></span>
+                </div>
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">Nome</span>
+                    <span class="card-detalhe-item__valor">${s.nome}</span>
+                </div>
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">Solicitante</span>
+                    <span class="card-detalhe-item__valor">${s.nomeSolicitante || 'Anônimo'}</span>
+                </div>
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">Contato Solicitante</span>
+                    <span class="card-detalhe-item__valor">${s.telefoneSolicitante || 'Não informado'}</span>
+                </div>
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">Endereço</span>
+                    <span class="card-detalhe-item__valor">${s.endereco}</span>
+                </div>
             </div>
-            <div class="card-detalhe-item">
-                <span class="card-detalhe-item__rotulo">Nome</span>
-                <span class="card-detalhe-item__valor">${s.nome}</span>
-            </div>
-            <div class="card-detalhe-item">
-                <span class="card-detalhe-item__rotulo">Solicitante</span>
-                <span class="card-detalhe-item__valor">${s.nomeSolicitante || 'Anônimo'}</span>
-            </div>
-            <div class="card-detalhe-item">
-                <span class="card-detalhe-item__rotulo">Contato Solicitante</span>
-                <span class="card-detalhe-item__valor">${s.telefoneSolicitante || 'Não informado'}</span>
-            </div>
-            <div class="card-detalhe-item">
-                <span class="card-detalhe-item__rotulo">Endereço</span>
-                <span class="card-detalhe-item__valor">${s.endereco}</span>
-            </div>
-        </div>
-    `;
+        `;
+    }
 
     abrirModalDialog(modal);
 }
 
-/* =========================================================
-   GERENCIAMENTO DE PONTOS DE DOAÇÃO / COLETA
-   ========================================================= */
+/* GERENCIAMENTO DE PONTOS DE DOAÇÃO / COLETA */
 async function carregarPontos() {
     const listaEl = document.getElementById('lista-pontos');
     const contEl = document.getElementById('cont-pontos');
@@ -494,7 +610,7 @@ function filtrarPontos(termo) {
     const filtrados = pontosCache.filter(p => 
         (p.nome && p.nome.toLowerCase().includes(t)) || 
         (p.endereco && p.endereco.toLowerCase().includes(t)) ||
-        (p.responsavel && p.responsavel.toLowerCase().includes(t))
+        (p.responsavel && (p.responsavel.nome || p.responsavel.name || "").toLowerCase().includes(t))
     );
     renderizarPontos(filtrados);
 }
@@ -506,9 +622,12 @@ function abrirModalPonto(ponto = null) {
     document.getElementById('pId').value = ponto ? (ponto.idPontoColeta || ponto.id) : '';
     document.getElementById('pNome').value = ponto ? ponto.nome : '';
     document.getElementById('pEndereco').value = ponto ? ponto.endereco : '';
-    document.getElementById('pResponsavel').value = ponto ? (ponto.responsavel || '') : '';
     document.getElementById('pTelefone').value = ponto ? (ponto.telefone || '') : '';
     document.getElementById('pHorario').value = ponto ? (ponto.horarioFuncionamento || '') : '';
+
+    // Carrega dinamicamente a lista e seta o id do responsável se houver
+    const responsavelId = ponto?.responsavel?.idUsuario || null;
+    popularDropdownResponsavel(responsavelId);
 
     const titulo = document.getElementById('modalPontoTitulo');
     if (titulo) titulo.textContent = ponto ? 'Editar ponto de doação' : 'Novo ponto de doação';
@@ -521,20 +640,30 @@ async function handleSalvarPonto(e) {
     const id = document.getElementById('pId').value;
     const modal = document.getElementById('modalPonto');
 
-    const payload = {
+    const dadosPonto = {
         nome: document.getElementById('pNome').value,
         endereco: document.getElementById('pEndereco').value,
-        responsavel: document.getElementById('pResponsavel').value,
+        responsavelId: document.getElementById('pResponsavel').value || null, // Busca id do dropdown
         telefone: document.getElementById('pTelefone').value,
         horarioFuncionamento: document.getElementById('pHorario').value,
         ativo: true
     };
 
     try {
+        const formData = new FormData();
+        formData.append('dados', new Blob([JSON.stringify(dadosPonto)], { type: 'application/json' }));
+
+        const inputFotos = document.getElementById('pFotos');
+        if (inputFotos && inputFotos.files) {
+            for (let i = 0; i < inputFotos.files.length; i++) {
+                formData.append('fotos', inputFotos.files[i]);
+            }
+        }
+
         if (id) {
-            await atualizarPontoColeta(id, payload);
+            await atualizarPontoColeta(id, formData); // Agora é Multipart no Backend
         } else {
-            await cadastrarPontoColeta(payload);
+            await cadastrarPontoColeta(formData); // Agora é Multipart no Backend
         }
 
         fecharModal(modal);
@@ -558,32 +687,88 @@ async function handleExcluirPonto(id) {
 function exibirDetalhesPonto(p) {
     const modal = document.getElementById('modalDetalheAdmin');
     const conteudo = document.getElementById('conteudoDetalheAdmin');
-    document.getElementById('modalDetalheTitulo').textContent = `Ponto: ${p.nome}`;
+    const divMidia = document.getElementById('modalDetalheMidia');
+    const imgFoto = document.getElementById('modalDetalheFoto');
+    const tituloEl = document.getElementById('modalDetalheTitulo');
+    
+    if (tituloEl) tituloEl.textContent = `Ponto: ${p.nome}`;
 
-    conteudo.innerHTML = `
-        <div class="grid-detalhes">
-            <div class="card-detalhe-item">
-                <span class="card-detalhe-item__rotulo">Nome do Ponto</span>
-                <span class="card-detalhe-item__valor">${p.nome}</span>
+    // Obtendo a primeira foto do ponto do novo array p.fotos
+    const fotoUrl = (p.fotos && p.fotos.length > 0) ? p.fotos[0] : '';
+
+    if (divMidia && imgFoto) {
+        if (fotoUrl) {
+            imgFoto.src = fotoUrl;
+            imgFoto.style.display = 'block';
+            divMidia.classList.remove('visualizacao-midia--fallback');
+            modal?.classList.remove('dialog-sem-imagem');
+        } else {
+            imgFoto.style.display = 'none';
+            divMidia.innerHTML = '<span style="font-size: 32px;">📍</span>';
+            divMidia.classList.add('visualizacao-midia--fallback');
+            modal?.classList.remove('dialog-sem-imagem');
+        }
+    }
+
+    if (conteudo) {
+        conteudo.innerHTML = `
+            <div class="grid-detalhes">
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">Nome do Ponto</span>
+                    <span class="card-detalhe-item__valor">${p.nome}</span>
+                </div>
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">Endereço</span>
+                    <span class="card-detalhe-item__valor">${p.endereco}</span>
+                </div>
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">Responsável</span>
+                    <span class="card-detalhe-item__valor">${p.responsavel ? (p.responsavel.nome || p.responsavel.name) : 'Não informado'}</span>
+                </div>
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">E-mail do Responsável</span>
+                    <span class="card-detalhe-item__valor">${p.responsavel ? p.responsavel.email : '-'}</span>
+                </div>
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">Telefone</span>
+                    <span class="card-detalhe-item__valor">${p.telefone || 'Não informado'}</span>
+                </div>
+                <div class="card-detalhe-item">
+                    <span class="card-detalhe-item__rotulo">Horário</span>
+                    <span class="card-detalhe-item__valor">${p.horarioFuncionamento || 'Não informado'}</span>
+                </div>
             </div>
-            <div class="card-detalhe-item">
-                <span class="card-detalhe-item__rotulo">Endereço</span>
-                <span class="card-detalhe-item__valor">${p.endereco}</span>
-            </div>
-            <div class="card-detalhe-item">
-                <span class="card-detalhe-item__rotulo">Responsável</span>
-                <span class="card-detalhe-item__valor">${p.responsavel || 'Não informado'}</span>
-            </div>
-            <div class="card-detalhe-item">
-                <span class="card-detalhe-item__rotulo">Telefone</span>
-                <span class="card-detalhe-item__valor">${p.telefone || 'Não informado'}</span>
-            </div>
-            <div class="card-detalhe-item">
-                <span class="card-detalhe-item__rotulo">Horário</span>
-                <span class="card-detalhe-item__valor">${p.horarioFuncionamento || 'Não informado'}</span>
-            </div>
-        </div>
-    `;
+        `;
+    }
 
     abrirModalDialog(modal);
+}
+
+// Adicione esta nova função no js/pages/admin-page.js para popular o select:
+async function popularDropdownResponsavel(idSelecionado = null) {
+    const selectEl = document.getElementById('pResponsavel');
+    if (!selectEl) return;
+
+    try {
+        // endpoint para obter os usuários aptos do seu novo UsuarioController
+        const response = await fetch('http://localhost:8080/api/v1/usuarios/responsaveis-disponiveis');
+        if (!response.ok) throw new Error('Não foi possível obter os usuários.');
+        
+        const usuarios = await response.json();
+        
+        selectEl.innerHTML = '<option value="">Selecione um responsável...</option>';
+        usuarios.forEach(user => {
+            const opt = document.createElement('option');
+            opt.value = user.idUsuario;
+            // Trata 'name' (entidade) ou 'nome' (DTO) para não exibir indefinido
+            const nomeExibicao = user.nome || user.name || "Sem Nome";
+            opt.textContent = `${nomeExibicao} (${user.email})`;
+            if (idSelecionado && user.idUsuario === idSelecionado) {
+                opt.selected = true;
+            }
+            selectEl.appendChild(opt);
+        });
+    } catch (err) {
+        console.error("Erro ao popular responsáveis:", err);
+    }
 }
